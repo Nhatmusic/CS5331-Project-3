@@ -11,16 +11,16 @@ var genres = [];
 var genresByYear = {};
 // var genresCount = [];
 
-d3.csv("./Dataset/mc1-reports-data.csv")
+d3.csv("./Dataset/data.csv")
     .row(function (d) {
         dataset.push(d)
         audioData.push(+d.time,
+            +d.shake_intensity,
             +d.sewer_and_water,
             +d.power,
             +d.roads_and_bridges,
             +d.medical,
-            +d.buildings,
-            +d.shake_intensity
+            +d.buildings
         )
 
     })
@@ -30,12 +30,6 @@ d3.csv("./Dataset/mc1-reports-data.csv")
         // dataset = songData;
         dataset.columns = songData.columns;
         console.log(dataset.columns)
-
-        // //get audiodata for k-mean cluster, assign the genre for each datapoint
-        // audioData.forEach((d, i) => {
-        //     d.location = dataset[i].location
-        // })
-
 
         // get features that used for mutlti-dimension coordinates
         features = songData.columns.slice(1, 10);
@@ -49,11 +43,6 @@ d3.csv("./Dataset/mc1-reports-data.csv")
                 if (feature != "location")
                     d[feature] = +d[feature];
             });
-            // var gen = d["genre"];
-            // // Create new element in genres count if the element is in first appears.
-            // if (!genres.includes(gen)) {
-            //     genres.push(gen);
-            // }
             //Add genres by each year
             if (!genresByYear.hasOwnProperty(year)) {
                 genresByYear[year] = [];
@@ -75,18 +64,6 @@ d3.csv("./Dataset/mc1-reports-data.csv")
         drawSlider();
         graphByYear(dataset, sliderTime.value());
         document.getElementById("genreContainer").style.display = "none";
-        //
-        // drawLegend();
-
-        //Using k-mean for 10 clusters, apply count genre in each cluster;
-        // getcluster(audioData)
-
-        //Using hierachical cluster method (source: https://harthur.github.io/clusterfck/ )
-        // var threshold = 14; // only combine two clusters with distance less than 14 ??? I still in question about the threshold
-        // var clusters = clusterfck.hcluster(audioData, clusterfck.EUCLIDEAN_DISTANCE,
-        //     clusterfck.AVERAGE_LINKAGE, threshold);
-        // console.log(clusters)
-
 
     });
 

@@ -25,15 +25,6 @@ svg {
     shape-rendering: crispEdges;
 }
 
-/*.axises text {*/
-    /*font-size: 10px;*/
-    /*!*stroke: black;*!*/
-    /*font-family: Times;*/
-    /*font-weight: lighter;*/
-    /*text-shadow: 0 1px 0 darkblue, 1px 0 0 #fff, 0 -1px 0 darkblue, -1px 0 0 #fff;*/
-    /*cursor: move;*/
-/*}*/
-
 .header {
     font-family: 'Open Sans', sans-serif;
     color: #555;
@@ -76,14 +67,7 @@ svg {
     width:700px;
     height:80px;
 }
-/*#theGraph{*/
-    /*float: left;*/
-    /*border: 1px solid black;*/
-    /*position:absolute;*/
-    /*left:713px;*/
-    /*width:630px;*/
-    /*height:400px;*/
-/*}*/
+
 /*Slider style*/
 input[type="radio"] {
     background-color: #ddd;

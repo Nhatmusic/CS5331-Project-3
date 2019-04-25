@@ -7,7 +7,7 @@ var parallelWidth = 1200, parallelHeight = 400,
     parallelContentHeight = parallelHeight - parallelMargin.top - parallelMargin.bottom;
 
 //Time Format and Parsing
-const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
 const formatYear = d3.timeFormat("%d");
 
 var parallelSvg = d3.select("#chart-area").append("svg").attr("width", parallelWidth + 200).attr("height", parallelHeight),
@@ -195,12 +195,6 @@ function drawGraph(songs, year, selectedGenres) {
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedGenres);
             else
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(genresByYear[year]);
-        } else if (d == "tempo" || d == "duration") {
-            yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0])
-                .domain(d3.extent(songs, function (fea) {
-                    return fea[d];
-                }))
-            // console.log(temp);
         } else
             yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0]).domain([0, 10]);
     });
@@ -257,8 +251,6 @@ function drawGraph(songs, year, selectedGenres) {
             // Call y-axises
             if (d == "location")
                 d3.select(this).call(d3.axisRight(yScale[d]));
-            else if (d == "duration")
-                d3.select(this).call(d3.axisLeft(yScale[d]).ticks(5).tickFormat(d3.format(",")));
             else
                 d3.select(this).call(d3.axisLeft(yScale[d]).ticks(5));
         })
@@ -330,7 +322,6 @@ function MouseOutLines(d) {
 }
 
 function path(d) {
-    // console.log('333333')
     return line(features.map(function (p) {
         return [position(p), yScale[p](d[p])];
     }));
@@ -414,18 +405,6 @@ function brush() {
             });
         }
     }
-    // Draw_Scatterplot(selected);
-
-    // Update foreground to only display selected values
-    // foreground.style("opacity",function(d) {
-    //         return actives.every(function(active) {
-    //             let result = active.extent[1] <= d[active.feature] && d[active.feature] <= active.extent[0];
-    //             if(result)selected.push(d);
-    //             return result;
-    //         }) ? "1" : "0.1";
-    //     });
-
-    // (actives.length>0)?out.text(d3.tsvFormat(selected.slice(0,24))):out.text(d3.tsvFormat(sample_data.slice(0,24)));;
 
 }
 
