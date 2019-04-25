@@ -196,7 +196,7 @@ function drawGraph(songs, year, selectedGenres) {
             else
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(genresByYear[year]);
         } else
-            yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0]).domain([0, 10]);
+            yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0]).domain([-1, 10]);
     });
 
     // Add blue foreground lines for focus.
