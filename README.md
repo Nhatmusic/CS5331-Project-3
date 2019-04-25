@@ -2,6 +2,12 @@
 
 App's Link: https://nhatmusic.github.io/CS5331-Project-3/
 Task Plan: (https://docs.google.com/document/d/1QsNrgIGv8CESoXGcuVemh7mpvuvKN3iwLNKmA_gX_p4/edit)
+## Questions
+1 – Emergency responders will base their initial response on the earthquake shake map. Use visual analytics to determine how their response should change based on damage reports from citizens on the ground. How would you prioritize neighborhoods for response? Which parts of the city are hardest hit? Limit your response to 1000 words and 10 images.
+Provide your answer and corresponding images here.
+2 – Use visual analytics to show uncertainty in the data. Compare the reliability of neighborhood reports. Which neighborhoods are providing reliable reports? Provide a rationale for your response. Limit your response to 1000 words and 10 images.
+Provide your answer and corresponding images here.
+3 – How do conditions change over time? How does uncertainty in change over time? Describe the key changes you see. Limit your response to 500 words and 8 images.
 
 ## Tasks:
 - Plot events from dataset on a map with different types of damage (Geospatial) (Darien, Hao)
