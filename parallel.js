@@ -128,8 +128,9 @@ function graphByGenre() {
     });
     selectedGenres.forEach(gen => {
         dataset.forEach(song => {
-            if (song.genre === gen)
+            if (song.location === gen)
                 selectedSongs.push(song);
+
         })
     });
     drawGraph(selectedSongs, 0, selectedGenres);
