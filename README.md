@@ -21,3 +21,8 @@ Task Plan: (https://docs.google.com/document/d/1QsNrgIGv8CESoXGcuVemh7mpvuvKN3iw
 - Time filtering
 - Average values by entries in a given time-step within the range
 - Process null value 
+- mc1-reports-data.csv fields:
+    - time: timestamp of incoming report/record, in the format YYYY-MM-DD hh:mm:ss
+    - location: id of neighborhood where person reporting is feeling the shaking and/or seeing the damage
+    - {shake_intensity, sewer_and_water, power, roads_and_bridges, medical, buildings}: reported categorical value of how violent the shaking was/how bad the damage was (0 - lowest, 10 - highest; missing data allowed)
+- Also included are two shakemap (PNG) files which indicate where the corresponding earthquakes' epicenters originate as well as how much shaking can be felt across the city.
