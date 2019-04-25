@@ -18,7 +18,8 @@ Provide your answer and corresponding images here.
     - location: id of neighborhood where person reporting is feeling the shaking and/or seeing the damage
     - {shake_intensity, sewer_and_water, power, roads_and_bridges, medical, buildings}: reported categorical value of how violent the shaking was/how bad the damage was (0 - lowest, 10 - highest; missing data allowed)
 - Also included are two shakemap (PNG) files which indicate where the corresponding earthquakes' epicenters originate as well as how much shaking can be felt across the city.
- ![Alt text](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/Dataset/countreport.JPG)
+
+![Alt text](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/Dataset/countreport.JPG)
 
 
 ## Tasks:
