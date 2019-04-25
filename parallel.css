@@ -66,7 +66,7 @@ svg {
 
 #chart-area{
     float: left;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     position:absolute;
     width:1350px;
     height:600px;
