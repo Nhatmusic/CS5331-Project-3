@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project 2 - Visualization</title>
+    <link rel="stylesheet" type="text/css" href="parallel.css">
+    <script src="./js/d3.v4.min.js"></script>
+    <script src="./js/colorbrewer.v1.min.js"></script>
+    <script src="./js/clusters.js"></script>
+    <script src="./js/math.min.js"></script>
+    <script src="./js/tsne.js"></script>
+    <script src="./Dataset/tsne_data.js"></script>
+    <script src="./js/clusterfck-0.1.js"></script>
+    <script src="./js/d3-legend.min.js"></script>
+</head>
+<style>
+    .chart {
+
+    }
+
+    .main text {
+        font: 10px sans-serif;
+    }
+
+    .axis line, .axis path {
+        shape-rendering: crispEdges;
+        stroke: black;
+        fill: none;
+    }
+
+    circle {
+        fill: black;
+    }
+    .node {
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    /*.link {*/
+    /*stroke: #000000;*/
+    /*stroke-opacity: .6;*/
+    /*}*/
+
+    .axis {
+        opacity: 0.5;
+        font: 10px sans-serif;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+    }
+    .link {
+        fill: #dddddd;
+        stroke-width: 1px;
+    }
+
+    .axis .domain {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .3;
+        stroke-width: 4px;
+        stroke-linecap: round;
+    }
+
+    .axis .halo {
+        fill: none;
+        stroke: #ddd;
+        stroke-width: 3px;
+        stroke-linecap: round;
+    }
+
+    .slider .handle {
+        fill: #fff;
+        stroke: #000;
+        stroke-opacity: .5;
+        stroke-width: 1.25px;
+        cursor: grab;
+    }
+
+</style>
+<body>
+        <div class="header">
+             Mini Challenge 1 Visualization
+        </div>
+        <div class="filter">
+            <label>Select Data Filter</br></label>
+            <input type="radio" name="chooseGraph" id="year" checked>By Date<br>
+            <input type="radio" name="chooseGraph" id="genre"> By Location<br>
+
+            <input type="submit" value="Choose" onclick="chooseOption()">
+            <input type="submit" value="Reset" onclick="resetAll()">
+        </div>
+        <!--<div><label>Year:</label></div>-->
+        <!--<div id="slider"></div>-->
+        <div id="slider">
+            <!--<div class="col-sm-1"><label>Year: </label></div>-->
+            <!--<div class="col-sm-2"><p id="value-time"></p></div>-->
+            <div class="col-sm-1"><div id="slider-time"></div></div>
+        </div>
+        <br>
+        <div class="genreContainer">
+
+            <div id="genreContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
+        </div>
+
+    </div>
+
+    <!--<div class="row">-->
+
+        <div id="legend-chart"></div>
+
+    <!--</div>-->
+
+<div class="row">
+    <div class="column">
+        <div id="chart-area" >
+            <h1>Parallel Coordinate Graph</h1>
+        </div>
+    </div>
+</div>
+<div id="controller"></div>
+<!--<div id="textDiv"></div>-->
+<!--<div id="theGraph">-->
+    <!--<h2>ScatterPlot of T-SNE Output</h2>-->
+<!--</div>-->
+<!--<script src="webworker.js"></script>-->
+<script src="https://unpkg.com/d3-simple-slider"></script>
+<script src="parallel.js"></script>
+<script src="main.js"></script>
+
+<!--<script src="legend.js"></script>-->
+</body>
+</html>
