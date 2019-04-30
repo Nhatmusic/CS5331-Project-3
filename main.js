@@ -1,7 +1,4 @@
-var raw_dataset = [];
 var dataset = [];
-var audioData = [];
-const testSize = 8000; // The size of our test data for development speed
 var topGenresAll = [];           // Must not be greater than the size of our precomputed
 var topGenres20 = [];            // t-SNE result if we are using it
 
@@ -9,30 +6,21 @@ let features = [];
 var selectedGenres = [];
 var genres = [];
 var genresByYear = {};
-// var genresCount = [];
 
-d3.csv("./Dataset/data.csv")
+d3.csv("./Dataset/data-optimized.csv")
     .row(function (d) {
-        dataset.push(d)
-        audioData.push(+d.time,
-            +d.shake_intensity,
-            +d.sewer_and_water,
-            +d.power,
-            +d.roads_and_bridges,
-            +d.medical,
-            +d.buildings
-        )
-
+        return d;
     })
-    .get(function (error, songData) {
-        raw_dataset = songData;     // Save a copy of the raw dataset
-        // audioData = audioData.slice(0, testSize); // Limit the test data for quick debugging
-        // dataset = songData;
-        dataset.columns = songData.columns;
-        console.log(dataset.columns)
+    .get(function (error, rows) {
+        dataset = rows;
+        dataset.columns = rows.columns;
+        console.log(dataset.columns);
 
         // get features that used for mutlti-dimension coordinates
-        features = songData.columns.slice(1, 10);
+        features = dataset.columns.filter(function(element) {
+          return (element !== "reportID" &&
+                  element !== "time");
+        });
         xScale.domain(features);
 
         // Doing Time Slider
@@ -40,7 +28,7 @@ d3.csv("./Dataset/data.csv")
         dataset.forEach(d => {
             var year = d.time = +formatYear(parseTime(d.time));
             features.forEach(feature => {
-                if (feature != "location")
+                if (feature !== "location")
                     d[feature] = +d[feature];
             });
             //Add genres by each year
