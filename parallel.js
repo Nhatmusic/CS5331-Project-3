@@ -6,10 +6,6 @@ var parallelWidth = 850, parallelHeight = 400,
     parallelContentWidth = parallelWidth - parallelMargin.left - parallelMargin.right,
     parallelContentHeight = parallelHeight - parallelMargin.top - parallelMargin.bottom;
 
-//Time Format and Parsing
-const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
-const formatYear = d3.timeFormat("%d");
-
 var parallelSvg = d3.select("#chart-area").append("svg").attr("width", parallelWidth + 200).attr("height", parallelHeight),
     g = parallelSvg.append("g").attr("transform", "translate(" + parallelMargin.left + "," + parallelMargin.top + ")"),
     titleGroup = parallelSvg.append("g").attr("transform", "translate(" + (parallelContentHeight - 15) + "," + (parallelMargin.top - 15) + ")");
@@ -35,10 +31,10 @@ var line = d3.line(),
 //drag object
 var dragging = {};
 
-function colorByTop20Genres(genre) {
-    var temp = topGenres20.map(d => d.location).slice(0, 19);
-    if (temp.includes(genre))
-        return color(genre);
+function colorByTop20Categories(category) {
+    var temp = topCategories20.map(d => d.location).slice(0, 19);
+    if (temp.includes(category))
+        return color(category);
     return "#000000";
 }
 
@@ -87,60 +83,60 @@ function resetAll() {
     d3.select("svg#slider").remove();
     drawSlider();
     graphByYear(dataset, sliderTime.value());
-    addCheckBoxes(genres);
+    addCheckBoxes(categories);
     document.getElementById("slider").style.display = "block";
-    document.getElementById("genreContainer").style.display = "none";
+    document.getElementById("categoryContainer").style.display = "none";
 }
 
 function chooseOption() {
     var yearChart = document.getElementById("slider"),
-        genreChart = document.getElementById("genreContainer"),
+        categoryChart = document.getElementById("categoryContainer"),
         yearChoice = document.getElementById("year"),
-        genreChoice = document.getElementById("genre")
+        categoryChoice = document.getElementById("category")
 
     if (yearChoice.checked) {
         yearChart.style.display = "block";
-        genreChart.style.display = "none";
+        categoryChart.style.display = "none";
         graphByYear(dataset, sliderTime.value());
 
     }
 
-    if (genreChoice.checked) {
-        // Add check boxes of genres
-        addCheckBoxes(genres);
+    if (categoryChoice.checked) {
+        // Add check boxes of categories
+        addCheckBoxes(categories);
         graphByGenre();
         yearChart.style.display = "none";
-        genreChart.style.display = "block";
+        categoryChart.style.display = "block";
 
     }
 }
 
 function graphByGenre() {
     var selectedSongs = [];
-    genres.forEach(d => {
+    categories.forEach(d => {
         var genChecked = document.getElementById(d);
 
 
-        if (genChecked.checked && !selectedGenres.includes(d))
-            selectedGenres.push(d);
-        else if (!genChecked.checked && selectedGenres.includes(d))
-            selectedGenres.splice(selectedGenres.indexOf(d), 1);
+        if (genChecked.checked && !selectedCategories.includes(d))
+            selectedCategories.push(d);
+        else if (!genChecked.checked && selectedCategories.includes(d))
+            selectedCategories.splice(selectedCategories.indexOf(d), 1);
     });
-    selectedGenres.forEach(gen => {
+    selectedCategories.forEach(gen => {
         dataset.forEach(song => {
             if (song.location === gen)
                 selectedSongs.push(song);
 
         })
     });
-    drawGraph(selectedSongs, 0, selectedGenres);
+    drawGraph(selectedSongs, 0, selectedCategories);
     // Draw_Scatterplot(selectedSongs);
-    console.log(selectedGenres);
+    console.log(selectedCategories);
 }
 
 function addCheckBoxes(array) {
     // console.log(array);
-    var genreContainer = document.getElementById("genreContainer");
+    var categoryContainer = document.getElementById("categoryContainer");
     array.forEach((d, i) => {
         //Add if checkbox not show
         if (document.getElementById(d) == null) {
@@ -155,9 +151,9 @@ function addCheckBoxes(array) {
             label.htmlFor = d;
             label.appendChild(document.createTextNode(d));
 
-            genreContainer.appendChild(checkbox);
-            genreContainer.appendChild(label);
-            genreContainer.appendChild(document.createElement("br"));
+            categoryContainer.appendChild(checkbox);
+            categoryContainer.appendChild(label);
+            categoryContainer.appendChild(document.createElement("br"));
         }
 
         // Set default check box
@@ -182,7 +178,7 @@ const minForegroundOpacity = "0.2";
 
 
 // Draw graph from songs data, and year (0: draw all year, else: draw by year)
-function drawGraph(songs, year, selectedGenres) {
+function drawGraph(songs, year, selectedCategories) {
     // console.log(year+ ": "+songs.length);
     d3.selectAll(".foreground").remove();
     d3.selectAll(".dimension").remove();
@@ -192,9 +188,9 @@ function drawGraph(songs, year, selectedGenres) {
         // Add Scale for each axis
         if (d == "location") {
             if (year == 0)
-                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedGenres);
+                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedCategories);
             else
-                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(genresByYear[year]);
+                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(categoriesByYear[year]);
         } else
             yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0]).domain([-1, 10]);
     });
@@ -212,7 +208,7 @@ function drawGraph(songs, year, selectedGenres) {
         })
         .attr("d", path)
         .attr("stroke", d => {
-            return colorByTop20Genres(d.location);
+            return colorByTop20Categories(d.location);
         })
         .attr("data-legend", function (d) {
             return d.location
@@ -285,7 +281,7 @@ function MouseOverLines(d) {
         .style("stroke-width", "4px")
         .style("opacity", maxForegroundOpacity);
 
-    // Show title - genre (Year)
+    // Show title - category (Year)
     titleGroup.append("text")
         .style("font-weight", "bold")
         .style("font", "12px sans-serif")
@@ -300,7 +296,7 @@ function MouseOverLines(d) {
         .attr("y", -15)
         .attr("width", 10).attr("height", 10)
         .style("fill", function () {
-            return colorByTop20Genres(d.location)
+            return colorByTop20Categories(d.location)
         });
 
     //Show song info to the graph

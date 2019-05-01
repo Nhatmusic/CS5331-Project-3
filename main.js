@@ -1,11 +1,15 @@
 var dataset = [];
-var topGenresAll = [];           // Must not be greater than the size of our precomputed
-var topGenres20 = [];            // t-SNE result if we are using it
+var topCategoriesAll = [];           // Must not be greater than the size of our precomputed
+var topCategories20 = [];            // t-SNE result if we are using it
 
 let features = [];
-var selectedGenres = [];
-var genres = [];
-var genresByYear = {};
+var selectedCategories = [];
+var categories = [];
+var categoriesByYear = {};
+
+//Time Format and Parsing
+const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
+const formatTime = d3.timeFormat("%d");
 
 d3.csv("./Dataset/data-optimized.csv")
     .row(function (d) {
@@ -24,66 +28,64 @@ d3.csv("./Dataset/data-optimized.csv")
         xScale.domain(features);
 
         // Doing Time Slider
-        // Time
         dataset.forEach(d => {
-            var year = d.time = +formatYear(parseTime(d.time));
+            var year = d.time = +formatTime(parseTime(d.time));
             features.forEach(feature => {
                 if (feature !== "location")
                     d[feature] = +d[feature];
             });
-            //Add genres by each year
-            if (!genresByYear.hasOwnProperty(year)) {
-                genresByYear[year] = [];
-                genresByYear[year].push(d.location);
+            //Add categories by each year
+            if (!categoriesByYear.hasOwnProperty(year)) {
+                categoriesByYear[year] = [];
+                categoriesByYear[year].push(d.location);
             } else {
-                if (!genresByYear[year].includes(d.location))
-                    genresByYear[year].push(d.location);
+                if (!categoriesByYear[year].includes(d.location))
+                    categoriesByYear[year].push(d.location);
             }
         });
 
 
-        topGenresAll = CountGenres(dataset);
-        topGenres20 = topGenresAll;
+        topCategoriesAll = CountCategories(dataset);
+        topCategories20 = topCategoriesAll;
 
-        // add genres after sorting
-        genres = topGenresAll.map(d => d.location);
+        // add categories after sorting
+        categories = topCategoriesAll.map(d => d.location);
 
-        // UpdateDataTSNE(bigdata.slice(0, testSize));
         drawSlider();
         graphByYear(dataset, sliderTime.value());
-        document.getElementById("genreContainer").style.display = "none";
+        document.getElementById("categoryContainer").style.display = "none";
 
     });
 
-// Count the genres and return a descending frequency-ordered list of top genres
-function CountGenres(data) {    // ***We could optimize this function further, but maybe later
-    var genres = [];            // ***I think it has O(N^2) time complexity or more     ~Darien
-    var count_genre = [];
-    var genre_queue = [];
-    //(data) get from d3.csv, push all genre to genres array
-    data.forEach(d => { // Build the list of genre occurrences
-        genres.push(d.location);
+// Count the categories and return a descending frequency-ordered list of top categories
+function CountCategories(data) {    // ***We could optimize this function further, but maybe later
+    var categories = [];            // ***I think it has O(N^2) time complexity or more     ~Darien
+    var count_category = [];
+    var category_queue = [];
+    //(data) get from d3.csv, push all category to categories array
+    data.forEach(d => { // Build the list of category occurrences
+        categories.push(d.location);
     });
 
     var count;
     data.forEach((d) => {
         count = 0;
-        if (!genre_queue.includes(d.location)) {        // If this genre has not been counted
-            for (i = 0; i < genres.length; i++) {   // Count the occurrences of this genre
-                if (genres[i] === d.location) {
+        if (!category_queue.includes(d.location)) {    // If this category has not been counted
+            for (i = 0; i < categories.length; i++) {   // Count the occurrences of this category
+                if (categories[i] === d.location) {
                     count++;
                 }
             }
-            genre_queue.push(d.location);              // Mark this genre as counted
-            count_genre.push({location: d.location, number: count})    // Add the count of this genre
+            category_queue.push(d.location);              // Mark this category as counted
+            count_category.push({location: d.location, number: count})    // Add the count of this category
         }
     });
 
-    //sort count_genre array
-    count_genre.sort(function (a, b) {
+    //sort count_category array
+    count_category.sort(function (a, b) {
         return b.number - a.number;
     });
 
-    return count_genre;
+    return count_category;
 }
 
