@@ -104,14 +104,14 @@ function chooseOption() {
     if (categoryChoice.checked) {
         // Add check boxes of categories
         addCheckBoxes(categories);
-        graphByGenre();
+        graphByCategory();
         timeSpanChart.style.display = "none";
         categoryChart.style.display = "block";
 
     }
 }
 
-function graphByGenre() {
+function graphByCategory() {
     var selectedSongs = [];
     categories.forEach(d => {
         var genChecked = document.getElementById(d);
@@ -145,7 +145,7 @@ function addCheckBoxes(array) {
             checkbox.name = d;
             checkbox.value = d;
             checkbox.id = d;
-            checkbox.onclick = graphByGenre;
+            checkbox.onclick = graphByCategory;
 
             var label = document.createElement('label')
             label.htmlFor = d;
