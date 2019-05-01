@@ -4,7 +4,7 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
     height = 500 - margin.top - margin.bottom;
 
 // parse the date / time
-var parseTime = d3.timeParse("%m/%d/%Y %H:%M");
+var parseTimeLineGraph = d3.timeParse("%m/%d/%Y %H:%M");
 
 // set the ranges
 var x = d3.scaleTime().range([0, width]);
@@ -19,7 +19,7 @@ var valueline = d3.line()
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
-var svg = d3.select("body").append("svg")
+var lineGraphSvg = d3.select("#line-graph").append("svg")
 .attr("width", width + margin.left + margin.right)
 .attr("height", height + margin.top + margin.bottom)
 .append("g")
@@ -32,7 +32,7 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   
   // format the data
   data.forEach(function(d) {
-    d.time = parseTime(d.time);
+    d.time = parseTimeLineGraph(d.time);
     d.medical = +d.medical;
     d.location = +d.location;
   });
@@ -45,26 +45,31 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   var categoryNest = d3.nest()
     .key(function(d) {return d.location;})
     .entries(data);
-  //
-  // // Make a line for each category
-  // categoryNest.forEach(function(d, i) {
-  //   svg.append("path")
-  //     .attr("class")
-  // })
+
+  // Make a line for each category
+  categoryNest.forEach(function(d, i) {
+    lineGraphSvg.append("path")
+      .attr("class", "line")
+      .style("stroke", function() {
+        return colorByTop20Categories(d.key);
+      })
+    .attr("id", "line" + d.key)
+    .attr("d", valueline(d.values));
+  });
   
-  // Add the valueline path.
-  svg.append("path")
-  .data([data])
-  .attr("class", "line")
-  .attr("d", valueline);
+  // // Add the valueline path.
+  // svg.append("path")
+  // .data([data])
+  // .attr("class", "line")
+  // .attr("d", valueline);
   
   // Add the X Axis
-  svg.append("g")
+  lineGraphSvg.append("g")
   .attr("transform", "translate(0," + height + ")")
   .call(d3.axisBottom(x));
   
   // Add the Y Axis
-  svg.append("g")
+  lineGraphSvg.append("g")
   .call(d3.axisLeft(y));
   
 });
