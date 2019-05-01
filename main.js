@@ -5,7 +5,7 @@ var topCategories20 = [];            // t-SNE result if we are using it
 let features = [];
 var selectedCategories = [];
 var categories = [];
-var categoriesByYear = {};
+var categoriesByTimeSpan = {};
 
 //Time Format and Parsing
 const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
@@ -29,18 +29,18 @@ d3.csv("./Dataset/data-optimized.csv")
 
         // Doing Time Slider
         dataset.forEach(d => {
-            var year = d.time = +formatTime(parseTime(d.time));
+            var timeSpan = d.time = +formatTime(parseTime(d.time));
             features.forEach(feature => {
                 if (feature !== "location")
                     d[feature] = +d[feature];
             });
-            //Add categories by each year
-            if (!categoriesByYear.hasOwnProperty(year)) {
-                categoriesByYear[year] = [];
-                categoriesByYear[year].push(d.location);
+            //Add categories by each timeSpan
+            if (!categoriesByTimeSpan.hasOwnProperty(timeSpan)) {
+                categoriesByTimeSpan[timeSpan] = [];
+                categoriesByTimeSpan[timeSpan].push(d.location);
             } else {
-                if (!categoriesByYear[year].includes(d.location))
-                    categoriesByYear[year].push(d.location);
+                if (!categoriesByTimeSpan[timeSpan].includes(d.location))
+                    categoriesByTimeSpan[timeSpan].push(d.location);
             }
         });
 
@@ -52,7 +52,7 @@ d3.csv("./Dataset/data-optimized.csv")
         categories = topCategoriesAll.map(d => d.location);
 
         drawSlider();
-        graphByYear(dataset, sliderTime.value());
+        graphByTimeSpan(dataset, sliderTime.value());
         document.getElementById("categoryContainer").style.display = "none";
 
     });

@@ -59,10 +59,10 @@ function drawSlider() {
         .on('onchange', val => {
             d3.select('p#value-time').text((val));
 
-            graphByYear(dataset,sliderTime.value());
+            graphByTimeSpan(dataset,sliderTime.value());
 
             legendisClicked = false; //set legend off-click
-            graphByYear(dataset, sliderTime.value());
+            graphByTimeSpan(dataset, sliderTime.value());
         });
 
     var gTime = d3
@@ -82,22 +82,22 @@ function drawSlider() {
 function resetAll() {
     d3.select("svg#slider").remove();
     drawSlider();
-    graphByYear(dataset, sliderTime.value());
+    graphByTimeSpan(dataset, sliderTime.value());
     addCheckBoxes(categories);
     document.getElementById("slider").style.display = "block";
     document.getElementById("categoryContainer").style.display = "none";
 }
 
 function chooseOption() {
-    var yearChart = document.getElementById("slider"),
+    var timeSpanChart = document.getElementById("slider"),
         categoryChart = document.getElementById("categoryContainer"),
-        yearChoice = document.getElementById("year"),
+        timeSpanChoice = document.getElementById("timeSpan"),
         categoryChoice = document.getElementById("category")
 
-    if (yearChoice.checked) {
-        yearChart.style.display = "block";
+    if (timeSpanChoice.checked) {
+        timeSpanChart.style.display = "block";
         categoryChart.style.display = "none";
-        graphByYear(dataset, sliderTime.value());
+        graphByTimeSpan(dataset, sliderTime.value());
 
     }
 
@@ -105,7 +105,7 @@ function chooseOption() {
         // Add check boxes of categories
         addCheckBoxes(categories);
         graphByGenre();
-        yearChart.style.display = "none";
+        timeSpanChart.style.display = "none";
         categoryChart.style.display = "block";
 
     }
@@ -163,13 +163,13 @@ function addCheckBoxes(array) {
     })
 }
 
-function graphByYear(data, year) {
+function graphByTimeSpan(data, timeSpan) {
     var selectedSongs = [];
     data.forEach(d => {
-        if (d.time == year)
+        if (d.time == timeSpan)
             selectedSongs.push(d);
     });
-    drawGraph(selectedSongs, year, null);
+    drawGraph(selectedSongs, timeSpan, null);
     // Draw_Scatterplot(selectedSongs);
 }
 
@@ -177,9 +177,9 @@ const maxForegroundOpacity = "1";
 const minForegroundOpacity = "0.2";
 
 
-// Draw graph from songs data, and year (0: draw all year, else: draw by year)
-function drawGraph(songs, year, selectedCategories) {
-    // console.log(year+ ": "+songs.length);
+// Draw graph from songs data, and timeSpan (0: draw all timeSpans, else: draw by timeSpan)
+function drawGraph(songs, timeSpan, selectedCategories) {
+    // console.log(timeSpan+ ": "+songs.length);
     d3.selectAll(".foreground").remove();
     d3.selectAll(".dimension").remove();
     // Make yScale for each dimension
@@ -187,10 +187,10 @@ function drawGraph(songs, year, selectedCategories) {
 
         // Add Scale for each axis
         if (d == "location") {
-            if (year == 0)
+            if (timeSpan == 0)
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedCategories);
             else
-                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(categoriesByYear[year]);
+                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(categoriesByTimeSpan[timeSpan]);
         } else
             yScale[d] = d3.scaleLinear().range([parallelContentHeight, 0]).domain([-1, 10]);
     });
@@ -281,7 +281,7 @@ function MouseOverLines(d) {
         .style("stroke-width", "4px")
         .style("opacity", maxForegroundOpacity);
 
-    // Show title - category (Year)
+    // Show title - category (TimeSpan)
     titleGroup.append("text")
         .style("font-weight", "bold")
         .style("font", "12px sans-serif")
@@ -394,9 +394,9 @@ function brush() {
     if (d3.brushSelection(this) == null) {     // If not brushing, update Scatter plot
         if (!selected.length) {
             var selectedSongs = [];
-            var year = sliderTime.value();
+            var timeSpan = sliderTime.value();
             dataset.forEach(d => {
-                if (d.time == year)
+                if (d.time == timeSpan)
                     selected.push(d);
             });
         }
