@@ -204,7 +204,7 @@ function drawGraph(songs, timeSpan, selectedCategories) {
         .enter()
         .append("path")
         .attr("id", d => {
-            return "path" + d.id;
+            return "path" + d.reportID;
         })
         .attr("d", path)
         .attr("stroke", d => {
@@ -277,7 +277,7 @@ function drawGraph(songs, timeSpan, selectedCategories) {
 }
 
 function MouseOverLines(d) {
-    d3.select("#path" + d.id)
+    d3.select("#path" + d.reportID)
         .style("stroke-width", "4px")
         .style("opacity", maxForegroundOpacity);
 
@@ -311,7 +311,7 @@ function MouseOverLines(d) {
 }
 
 function MouseOutLines(d) {
-    d3.select("#path" + d.id)
+    d3.select("#path" + d.reportID)
         .style("stroke-width", "1px")
         .style("opacity", minForegroundOpacity);
     d3.selectAll(".title").remove();
