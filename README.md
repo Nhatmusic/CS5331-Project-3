@@ -26,7 +26,7 @@ Provide your answer and corresponding images here.
 
 ## Tasks:
 - Plot events from dataset on a map with different types of damage (Geospatial) (Darien, Hao)
-- Plot events over time as a stacked graph (Darien, Nhat)
+- Plot events over time as a line graph, with approximated lines and outlying points with areas of standard deviation (Darien, Nhat)
 - Plot events over animated time with a parallel coordinate graph (Nhat, Hao)
 ## Functionality:
 - Categorize by areas and types of damage
@@ -38,3 +38,8 @@ Provide your answer and corresponding images here.
 - We can use a drop-down or a log-scale slider
 - Filter the data by time range
 - We can use a brush or double slider
+
+## Observations:
+Reports of "medical" damage (or lack thereof) coincides with the presence of hospitals in the area
+
+![Hospitals and Medical Damage](images/observations/medical-damage-and-hospitals.png)
