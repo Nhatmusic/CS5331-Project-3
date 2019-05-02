@@ -8,14 +8,13 @@ svg {
     shape-rendering: crispEdges;
 }
 
-.bgimg {
+.geospatial {
     float: left;
     /*border: 1px solid black;*/
     left: 920px;
     position:absolute;
     width:500px;
     height:410px;
-    background-image: url("./Dataset/map.png");
 }
 .foreground path {
     fill: none;

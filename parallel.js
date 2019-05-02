@@ -26,7 +26,7 @@ var xAxis = d3.axisBottom(xScale),
 var xAxisGroup;
 
 // Define line
-var line = d3.line(),
+var line = d3.line(d3.curveBasis),
     //Background and foreground line
     foreground;
 
