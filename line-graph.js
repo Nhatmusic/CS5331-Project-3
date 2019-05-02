@@ -31,6 +31,16 @@ var parseDateStringToObject = d3.timeParse("%a %b %d %Y %H:%M:%S GMT%Z (Central 
 var x = d3.scaleTime().range([0, lineGraphContentWidth]);
 var y = d3.scaleLinear().range([lineGraphContentHeight, 0]);
 
+// Add the X Axis
+lineGraphSvg.append("g")
+.attr("transform", "translate(0," + lineGraphContentHeight + ")")
+.call(d3.axisBottom(x));
+
+// Add the Y Axis
+lineGraphSvg.append("g")
+.call(d3.axisLeft(y));
+
+
 // Takes a date object and rounds it down to the nearest hour
 function RoundTimeHour(dateObject) {
   let timeStampUTC = +dateObject; // Convert the date object to a UTC timestamp in milliseconds
@@ -42,14 +52,21 @@ function RoundTimeHour(dateObject) {
 }
 
 // Takes a date in string format and returns a rounded date object
-function CleanTime(dateString) {
-  let dateObject = parseDateStringToObject(dateString);
-  return dateObject;
-}
+function CleanTime(dateString) {                  // This function should be deleted if it is
+  return parseDateStringToObject(dateString);     // not further modified by the end of this
+}                                                 // project because it is currently redundant
+
+var IGNORE_NULL_LINE_GRAPH = true;  // This is a switch that determines whether or not the null data will be ignored
 
 // define the line
 var linePath = d3.line()
-.defined(function(d) { return d.value; })
+.defined(function(d) {
+  if (IGNORE_NULL_LINE_GRAPH) { // Conditionally ignore the null data on the line graph
+    return d.value >= 0;
+  } else {
+    return d.value;
+  }
+})
 .x(function(d) {
   return x(CleanTime(d.key));
 })
@@ -59,7 +76,7 @@ var linePath = d3.line()
 d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   if (error) throw error;
   
-  // format the data
+  // Format the data to the proper datatypes
   data.forEach(function(d) {
     d.time = parseTimeLineGraph(d.time);
     d.medical = +d.medical;
@@ -67,21 +84,27 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   });
   
   // Scale the range of the data
-  x.domain(d3.extent(data.slice(0,20000), function(d) { return d.time; }));
+  let TEST_RENDER_SIZE_LINE_GRAPH = 20000;  // Temporary limit for chart testing
+  x.domain(d3.extent(data.slice(0,TEST_RENDER_SIZE_LINE_GRAPH), function(d) { return d.time; }));
   y.domain([-1, d3.max(data, function(d) { return d.medical; })]);
   
   // Nest the entries by category
   var categoryNest = d3.nest()
-    .key(function(d) { return d.location; })
-    .key(function(d) {
+    .key(function(d) { return d.location; })  // Sort by location
+    .key(function(d) {                        // Then sort by time
       return RoundTimeHour(d.time);
     })
-    .rollup(function(v) {
-      let nullFilteredArray = v;
-      let averageValue = d3.mean(nullFilteredArray, function(d) {
+    .rollup(function(v) {   // Perform aggregate operations on the grouped data
+      if (IGNORE_NULL_LINE_GRAPH) {   // Conditionally filter the null entries
+        v = v.filter(function(element) {  // Filter out the entries that have null data
+          return element.medical !== -1;
+        });
+      } else {
+        // Don't do anything for now
+      }
+      return d3.mean(v, function(d) { // Calculate the mean of all the entries in this group
         return d.medical;
       });
-      return averageValue;
     })
     .entries(data);
 
@@ -93,16 +116,6 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
         return colorByTop20Categories(d.key);
       })
     .attr("id", "line" + d.key)
-    .attr("d", linePath(d.values));
+    .attr("d", linePath(d.values)); // Draw the line
   });
-  
-  // Add the X Axis
-  lineGraphSvg.append("g")
-  .attr("transform", "translate(0," + lineGraphContentHeight + ")")
-  .call(d3.axisBottom(x));
-  
-  // Add the Y Axis
-  lineGraphSvg.append("g")
-  .call(d3.axisLeft(y));
-  
 });
