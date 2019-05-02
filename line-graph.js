@@ -9,6 +9,8 @@ var lineGraphMargin = {
     lineGraphHeight = 300,
     lineGraphContentWidth = lineGraphWidth - lineGraphMargin.left - lineGraphMargin.right,
     lineGraphContentHeight = lineGraphHeight - lineGraphMargin.top - lineGraphMargin.bottom,
+    lineGraphPositionX = 0,
+    lineGraphPositionY = 450;
 
 // parse the date / time
 var parseTimeLineGraph = d3.timeParse("%m/%d/%Y %H:%M");
@@ -29,6 +31,7 @@ var linePath = d3.line()
 var lineGraphSvg = d3.select("#line-graph").append("svg")
 .attr("width", lineGraphContentWidth + lineGraphMargin.left + lineGraphMargin.right)
 .attr("height", lineGraphContentHeight + lineGraphMargin.top + lineGraphMargin.bottom)
+.attr("transform", "translate(" + lineGraphPositionX + "," + lineGraphPositionY + ")")
 .append("g")
 .attr("transform",
     "translate(" + lineGraphMargin.left + "," + lineGraphMargin.top + ")");
