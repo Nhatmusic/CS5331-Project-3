@@ -12,19 +12,6 @@ var lineGraphMargin = {
     lineGraphPositionX = 0,
     lineGraphPositionY = 450;
 
-// parse the date / time
-var parseTimeLineGraph = d3.timeParse("%m/%d/%Y %H:%M");
-
-// set the ranges
-var x = d3.scaleTime().range([0, lineGraphContentWidth]);
-var y = d3.scaleLinear().range([lineGraphContentHeight, 0]);
-
-// define the line
-var linePath = d3.line()
-.defined(function(d) { return d.medical !== -1; })
-.x(function(d) { return x(d.time); })
-.y(function(d) { return y(d.medical); });
-
 // append the svg object to the body of the page
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
@@ -35,6 +22,19 @@ var lineGraphSvg = d3.select("#line-graph").append("svg")
 .append("g")
 .attr("transform",
     "translate(" + lineGraphMargin.left + "," + lineGraphMargin.top + ")");
+
+// parse the date / time
+var parseTimeLineGraph = d3.timeParse("%m/%d/%Y %H:%M");
+
+// set the ranges
+var x = d3.scaleTime().range([0, lineGraphContentWidth]);
+var y = d3.scaleLinear().range([lineGraphContentHeight, 0]);
+
+// define the line
+var linePath = d3.line()
+.defined(function(d) { return d.value >= 0; })
+.x(function(d) { return x(d.key); })
+.y(function(d) { return y(d.value); });
 
 // Get the data
 d3.csv("./Dataset/data-optimized.csv", function(error, data) {
@@ -53,7 +53,13 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   
   // Nest the entries by category
   var categoryNest = d3.nest()
-    .key(function(d) {return d.location;})
+    .key(function(d) { return d.location; })
+    .key(function(d) { return d.time; })
+    .rollup(function(v) {
+      return d3.mean(v, function(d) {
+        return d.medical;
+      });
+    })
     .entries(data);
 
   // Make a line for each category
