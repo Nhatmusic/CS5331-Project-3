@@ -63,6 +63,7 @@ function drawSlider() {
 
             legendisClicked = false; //set legend off-click
             graphByTimeSpan(dataset, sliderTime.value());
+            // graphByYear(dataset, sliderTime.value());
         });
 
     var gTime = d3
