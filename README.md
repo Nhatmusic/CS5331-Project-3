@@ -38,7 +38,8 @@ Provide your answer and corresponding images here.
 - We can use a drop-down or a log-scale slider
 - Filter the data by time range
 - We can use a brush or double slider
-
+## Line Graph:
+![Alt text](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/initial-line-graph.png)
 ## Observations:
 Reports of "medical" damage (or lack thereof) coincides with the presence of hospitals in the area
 
