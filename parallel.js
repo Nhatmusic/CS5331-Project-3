@@ -13,7 +13,9 @@ var parallelSvg = d3.select("#chart-area").append("svg").attr("width", parallelW
 // x, y, and color Scale
 var xScale = d3.scalePoint().range([0, parallelContentWidth]),
     yScale = {},
-    color = d3.scaleOrdinal().range(d3.schemeCategory20);
+    // color = d3.scaleOrdinal().range(d3.schemeCategory20);
+//hardcode the color of location to match with map's color.
+    color = ['#0000', '#f4429e', '#ad42f4', '#f4f142', '#ce42f4', '#f4aa42', '#42e2f4', '#42f489', '#f4f442', '#ce42f4', '#42f1f4', '#f4c542', '#f47742', '#42c5f4', '#42f4f4', '#4274f4', '#42f47d', '#eef442', '#f4c542', '#f48042'];
 
 // axises definition
 var xAxis = d3.axisBottom(xScale),
@@ -24,7 +26,7 @@ var xAxis = d3.axisBottom(xScale),
 var xAxisGroup;
 
 // Define line
-var line = d3.line(),
+var line = d3.line(d3.curveBasis),
     //Background and foreground line
     foreground;
 
@@ -34,7 +36,7 @@ var dragging = {};
 function colorByTop20Categories(category) {
     var temp = topCategories20.map(d => d.location).slice(0, 19);
     if (temp.includes(category))
-        return color(category);
+        return color[category];
     return "#000000";
 }
 
