@@ -1,7 +1,7 @@
 # CS5331-Project-3
 
 App's Link: https://nhatmusic.github.io/CS5331-Project-3/
-Task Plan: (https://docs.google.com/document/d/1QsNrgIGv8CESoXGcuVemh7mpvuvKN3iwLNKmA_gX_p4/edit)
+
 ## Questions
 - Emergency responders will base their initial response on the earthquake shake map. Use visual analytics to determine how their response should change based on damage reports from citizens on the ground. How would you prioritize neighborhoods for response? Which parts of the city are hardest hit? Limit your response to 1000 words and 10 images.
 Provide your answer and corresponding images here.
