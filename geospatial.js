@@ -43,20 +43,39 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
+        var featureDamage = [0,0,0,0,0,0];
         location.values.forEach(d=>{
-            features1.forEach(feature=>{
+            // console.log(d);
+            features.forEach((feature,i)=>{
                 totalDamage += +d[feature];
+                if(feature!=="location")
+                    featureDamage[i] += +d[feature];
             })
         });
 
 
+        // var temp = 0;
+        // featureDamage.map(d=>{temp += d/location.values.length});
+        //
+        // console.log(temp/6);
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
-        averageLocationDamage.push({location: location.key, averagedamage: Math.round(totalDamage/location.values.length),nReports: location.values.length});
+        averageLocationDamage.push({location: location.key,
+            totalDamage: totalDamage,
+            nReports: location.values.length,
+            averagedamage: Math.round(totalDamage/location.values.length),
+            sewer_and_water:(featureDamage[0]/location.values.length).toFixed(1),
+            power:(featureDamage[1]/location.values.length).toFixed(1),
+            roads_and_bridges:(featureDamage[2]/location.values.length).toFixed(1),
+            medical:(featureDamage[3]/location.values.length).toFixed(1),
+            buildings:(featureDamage[4]/location.values.length).toFixed(1),
+            shake_intensity:(featureDamage[5]/location.values.length).toFixed(1)
+        });
     });
 
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
     GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
+    // GeoColor.domain([0,10]);
     // GeoColor.domain([0,19]);
     console.log(averageLocationDamage);
 
@@ -94,11 +113,19 @@ function drawMapByDamage(data) {
                 .text("Id: " + d.properties.Id + " - "+d.properties.Nbrhood +
                     ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
                     ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
+            group.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
+                .text("sewer: " + averageLocationDamage[indexInTotal].sewer_and_water +
+                    " - power: " + averageLocationDamage[indexInTotal].power +
+                    " - Road & bridge: " + averageLocationDamage[indexInTotal].roads_and_bridges +
+                    " - medical: " + averageLocationDamage[indexInTotal].medical +
+                    " - buildings: " + averageLocationDamage[indexInTotal].buildings +
+                    " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
 
             d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_HOVER);
         })
         .on("mouseout",d=>{
             d3.select(".textLabel").remove();
+            d3.select(".textLabel2").remove();
             d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_DEFAULT);
         })
 }
