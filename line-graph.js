@@ -25,6 +25,7 @@ var lineGraphSvg = d3.select("#line-graph").append("svg")
 
 // parse the date / time
 var parseTimeLineGraph = d3.timeParse("%m/%d/%Y %H:%M");
+var parseTimeStringToDate = d3.timeParse("%a %b %d %Y %H:%M:%S GMT%Z (Central Daylight Time)");
 
 // set the ranges
 var x = d3.scaleTime().range([0, lineGraphContentWidth]);
@@ -33,7 +34,7 @@ var y = d3.scaleLinear().range([lineGraphContentHeight, 0]);
 // define the line
 var linePath = d3.line()
 .defined(function(d) { return d.value >= 0; })
-.x(function(d) { return x(d.key); })
+.x(function(d) { return x(parseTimeStringToDate(d.key)); })
 .y(function(d) { return y(d.value); });
 
 // Get the data
@@ -48,7 +49,7 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   });
   
   // Scale the range of the data
-  x.domain(d3.extent(data.slice(0,100), function(d) { return d.time; }));
+  x.domain(d3.extent(data.slice(0,1000), function(d) { return d.time; }));
   y.domain([0, d3.max(data, function(d) { return d.medical; })]);
   
   // Nest the entries by category
