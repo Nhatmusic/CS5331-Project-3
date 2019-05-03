@@ -1,13 +1,14 @@
 
 
 
+
 // drawGeoSlider();
 
-var width = 900;
-var height = 600;
+var geoWidth = 900;
+var geoHeight = 600;
 
-var svg1 = d3.select(".geospatial").append("svg").attr("width",width).attr("height",height);
-var group = svg1.append("g").attr("transform","translate(30,10)");
+var svgGeo = d3.select(".geospatial").append("svg").attr("width",geoWidth).attr("height",geoHeight);
+var group = svgGeo.append("g").attr("transform","translate(30,10)");
 // var textLabel = g.append("text").attr("class","textLabel").attr("x",0).attr("y",0);
 
 // color feature
@@ -20,7 +21,7 @@ var geopath = d3.geoPath().projection(projection);
 
 //Time Format and Parsing
 //format of data: 2020-04-09 12:30:00
-const parseTime1 = d3.timeParse("%Y-%m-%d %H:%M:%S");
+const parseTimeGeo = d3.timeParse("%Y-%m-%d %H:%M:%S");
 const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
 const observeTime = d3.timeParse("%m/%d/%Y %H");
 
@@ -29,16 +30,16 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 var averageLocationDamageObj = {};
 var averageLocationDamage = [];
 var locationList = [];
-var features1 = [];
+var featuresGeo = [];
 d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row=>{
-        row.time = observeTime(formatDayAndHour(parseTime1(row.time)));
+        row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
         // console.log(row.time);
     });
-    features1 = rows.columns.slice(1,8);
-    console.log(features1);
+    featuresGeo = rows.columns.slice(1,8);
+    console.log(featuresGeo);
     var timeRange = d3.extent(rows,d=>{return d.time});
     var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
     dataByLocation.forEach(location=>{
@@ -46,7 +47,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         var featureDamage = [0,0,0,0,0,0];
         location.values.forEach(d=>{
             // console.log(d);
-            features.forEach((feature,i)=>{
+            featuresGeo.forEach((feature,i)=>{
                 totalDamage += +d[feature];
                 if(feature!=="location")
                     featureDamage[i] += +d[feature];
