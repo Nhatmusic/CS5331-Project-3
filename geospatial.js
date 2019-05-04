@@ -1,8 +1,16 @@
-
-
-
-
 // drawGeoSlider();
+// Hospital list
+var hospitals = [
+    {name: 1,position: [-119.959400, 0.180960]},
+    {name: 2,position: [-119.915900, 0.153120]},
+    {name: 3,position: [-119.909520, 0.151090]},
+    {name: 4,position: [-119.904300, 0.121800]},
+    {name: 5,position: [-119.883420, 0.134560]},
+    {name: 6,position: [-119.855580, 0.182990]},
+    {name: 7,position: [-119.828610, 0.041470]},
+    {name: 8,position: [-119.744800, 0.065250]}];
+var nuclearPlant = [-119.784825,0.162679];
+
 
 var geoWidth = 900;
 var geoHeight = 600;
@@ -24,7 +32,6 @@ var geopath = d3.geoPath().projection(projection);
 const parseTimeGeo = d3.timeParse("%Y-%m-%d %H:%M:%S");
 const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
 const observeTime = d3.timeParse("%m/%d/%Y %H");
-
 
 
 var averageLocationDamageObj = {};
@@ -85,20 +92,21 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
 
         // console.log(geojson);
-        drawMapByDamage(geojson.features);
+        drawMap(geojson.features);
 
     });
 
-
+    // console.log(projection(nuclearPlant));
 });
 
 
 
-function drawMapByDamage(data) {
+function drawMap(data) {
 
     const GEO_OPACITY_DEFAULT = 0.7;
     const GEO_OPACITY_HOVER = 0.3;
 
+    //Draw Map
     group.selectAll("path").data(data)
         .enter()
         .append("path").attr("d", geopath)
@@ -128,7 +136,25 @@ function drawMapByDamage(data) {
             d3.select(".textLabel").remove();
             d3.select(".textLabel2").remove();
             d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_DEFAULT);
-        })
+        });
+
+    // Draw hospital
+    group.selectAll("hospitals").data(hospitals)
+        .enter()
+        .append("circle")
+        .attr("class","hospitals")
+        .attr("cx",d=>projection(d.position)[0])
+        .attr("cy",d=>projection(d.position)[1])
+        .attr("r",5)
+        .attr("fill","red");
+
+    group.append("circle")
+        .attr("id","nuclear")
+        .attr("cx",d=>projection(nuclearPlant)[0])
+        .attr("cy",d=>projection(nuclearPlant)[1])
+        .attr("r",12)
+        .attr("fill","#fcd80f")
+
 }
 
 function findIndexInArrayObject(array,value ) {
