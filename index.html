@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <title>Mini Challenge 1 Visualization</title>
     <link rel="stylesheet" type="text/css" href="parallel.css">
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="./js/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
     <script src="./js/colorbrewer.v1.min.js"></script>
     <script src="./js/math.min.js"></script>
+    <script src="./js/underscore.js"></script>
     <script src="./js/d3-legend.min.js"></script>
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
@@ -110,11 +114,12 @@
         <div class="geospatial">
             <h2>Geospatial Graph</h2>
         </div>
-        <!--<div class="bgimg">-->
-            <!--City's Map-->
-        <!--</div>-->
+        <div id="heatmap">
+        </div>
+
 <div id="controller"></div>
 <script src="https://unpkg.com/d3-simple-slider"></script>
+        <script src="heatmap.js" ></script>
         <script src="geospatial.js" ></script>
 <script src="parallel.js"></script>
 <script src="main.js"></script>

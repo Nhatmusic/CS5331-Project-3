@@ -47,13 +47,11 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     });
     featuresGeo = rows.columns.slice(1,8);
     console.log(featuresGeo);
-    var timeRange = d3.extent(rows,d=>{return d.time});
     var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
         var featureDamage = [0,0,0,0,0,0];
         location.values.forEach(d=>{
-            // console.log(d);
             featuresGeo.forEach((feature,i)=>{
                 totalDamage += +d[feature];
                 if(feature!=="location")
@@ -62,10 +60,6 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         });
 
 
-        // var temp = 0;
-        // featureDamage.map(d=>{temp += d/location.values.length});
-        //
-        // console.log(temp/6);
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
         averageLocationDamage.push({location: location.key,
@@ -83,12 +77,6 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
     GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
-    // GeoColor.domain([0,10]);
-    // GeoColor.domain([0,19]);
-    console.log(averageLocationDamage);
-
-
-
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
 
         // console.log(geojson);
@@ -96,7 +84,6 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
     });
 
-    // console.log(projection(nuclearPlant));
 });
 
 
@@ -165,3 +152,5 @@ function findIndexInArrayObject(array,value ) {
         }});
     return index;
 }
+
+

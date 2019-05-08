@@ -16,6 +16,14 @@ svg {
     width:500px;
     height:410px;
 }
+#heatmap{
+    float: left;
+    /*border: 1px solid black;*/
+    position:absolute;
+    top: 800px;
+    width:1200px;
+    height:4000px;
+}
 .foreground path {
     fill: none;
 }
