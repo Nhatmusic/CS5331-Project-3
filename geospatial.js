@@ -1,13 +1,22 @@
-
-
-
 // drawGeoSlider();
+// Hospital list
+var hospitals = [
+    {name: 1,position: [-119.959400, 0.180960]},
+    {name: 2,position: [-119.915900, 0.153120]},
+    {name: 3,position: [-119.909520, 0.151090]},
+    {name: 4,position: [-119.904300, 0.121800]},
+    {name: 5,position: [-119.883420, 0.134560]},
+    {name: 6,position: [-119.855580, 0.182990]},
+    {name: 7,position: [-119.828610, 0.041470]},
+    {name: 8,position: [-119.744800, 0.065250]}];
+var nuclearPlant = [-119.784825,0.162679];
 
-var width = 900;
-var height = 600;
 
-var svg1 = d3.select(".geospatial").append("svg").attr("width",width).attr("height",height);
-var group = svg1.append("g").attr("transform","translate(30,10)");
+var geoWidth = 900;
+var geoHeight = 600;
+
+var svgGeo = d3.select(".geospatial").append("svg").attr("width",geoWidth).attr("height",geoHeight);
+var group = svgGeo.append("g").attr("transform","translate(30,10)");
 // var textLabel = g.append("text").attr("class","textLabel").attr("x",0).attr("y",0);
 
 // color feature
@@ -20,33 +29,30 @@ var geopath = d3.geoPath().projection(projection);
 
 //Time Format and Parsing
 //format of data: 2020-04-09 12:30:00
-const parseTime1 = d3.timeParse("%Y-%m-%d %H:%M:%S");
+const parseTimeGeo = d3.timeParse("%Y-%m-%d %H:%M:%S");
 const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
 const observeTime = d3.timeParse("%m/%d/%Y %H");
-
 
 
 var averageLocationDamageObj = {};
 var averageLocationDamage = [];
 var locationList = [];
-var features1 = [];
+var featuresGeo = [];
 d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row=>{
-        row.time = observeTime(formatDayAndHour(parseTime1(row.time)));
+        row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
         // console.log(row.time);
     });
-    features1 = rows.columns.slice(1,8);
-    console.log(features1);
-    var timeRange = d3.extent(rows,d=>{return d.time});
+    featuresGeo = rows.columns.slice(1,8);
+    console.log(featuresGeo);
     var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
         var featureDamage = [0,0,0,0,0,0];
         location.values.forEach(d=>{
-            // console.log(d);
-            features.forEach((feature,i)=>{
+            featuresGeo.forEach((feature,i)=>{
                 totalDamage += +d[feature];
                 if(feature!=="location")
                     featureDamage[i] += +d[feature];
@@ -54,10 +60,6 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         });
 
 
-        // var temp = 0;
-        // featureDamage.map(d=>{temp += d/location.values.length});
-        //
-        // console.log(temp/6);
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
         averageLocationDamage.push({location: location.key,
@@ -75,29 +77,23 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
     GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
-    // GeoColor.domain([0,10]);
-    // GeoColor.domain([0,19]);
-    console.log(averageLocationDamage);
-
-
-
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
 
         // console.log(geojson);
-        drawMapByDamage(geojson.features);
+        drawMap(geojson.features);
 
     });
-
 
 });
 
 
 
-function drawMapByDamage(data) {
+function drawMap(data) {
 
     const GEO_OPACITY_DEFAULT = 0.7;
     const GEO_OPACITY_HOVER = 0.3;
 
+    //Draw Map
     group.selectAll("path").data(data)
         .enter()
         .append("path").attr("d", geopath)
@@ -127,7 +123,25 @@ function drawMapByDamage(data) {
             d3.select(".textLabel").remove();
             d3.select(".textLabel2").remove();
             d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_DEFAULT);
-        })
+        });
+
+    // Draw hospital
+    group.selectAll("hospitals").data(hospitals)
+        .enter()
+        .append("circle")
+        .attr("class","hospitals")
+        .attr("cx",d=>projection(d.position)[0])
+        .attr("cy",d=>projection(d.position)[1])
+        .attr("r",5)
+        .attr("fill","red");
+
+    group.append("circle")
+        .attr("id","nuclear")
+        .attr("cx",d=>projection(nuclearPlant)[0])
+        .attr("cy",d=>projection(nuclearPlant)[1])
+        .attr("r",12)
+        .attr("fill","#fcd80f")
+
 }
 
 function findIndexInArrayObject(array,value ) {
@@ -138,3 +152,5 @@ function findIndexInArrayObject(array,value ) {
         }});
     return index;
 }
+
+
