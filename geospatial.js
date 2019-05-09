@@ -45,9 +45,28 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
         // console.log(row.time);
     });
+
+    // Get columns of data
     featuresGeo = rows.columns.slice(1,8);
-    console.log(featuresGeo);
+
+
+    // time range
+    var timeRange = d3.extent(rows,d=>{return d.time});console.log(timeRange);
+
+    // nest data by location
+    //update boxplot
     var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
+
+    //nest data by time and sort data
+    var dataByTime = d3.nest().key(d=>d.time).entries(rows);
+    dataByTime.sort((a,b)=>new Date(a.key) - new Date(b.key));
+
+    // Draw Slider
+    var time = [];
+    dataByTime.map(d=>{time.push(d.key)});
+    drawGeoSlider(time);
+
+    // Handle dataByLocation
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
         var featureDamage = [0,0,0,0,0,0];
@@ -85,6 +104,66 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     });
 
 });
+
+function getTimeFormatforSlider(time) {
+    var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','August','Sep','Oct','Nov','Dec'];
+
+
+    // Format "Mon Apr 06 00:00"
+    var handledDate = (time.getDate() < 10) ? "0"+time.getDate() : time.getDate();
+
+    return days[time.getDay()] + " "
+        + months[time.getMonth()] + " " + handledDate + " "
+        + time.getHours() + ":0" + time.getMinutes();
+}
+
+function drawGeoSlider(data) {
+
+    var dataFullTime = [];
+    let temp = data[0];
+
+    // console.log(typeof (new Date(temp)));
+    data.map(d=>{dataFullTime.push(new Date(d))});
+
+    // Create slider with properties
+    var sliderRange = d3
+        .sliderBottom()
+        .min(dataFullTime[0])
+        .max(dataFullTime[dataFullTime.length-1])
+        .step(1000*60*60)       // Step moving by hour = (milisecs * secs * mins)
+        .width(300)
+        // .tickFormat(d3.format('.2%'))
+        .ticks(5)
+        .default([dataFullTime[0],dataFullTime[dataFullTime.length-1]])
+        .fill('#2196f3')
+        .on('onchange', val => {
+            var text = [];
+            val.forEach(d=>{
+                if(typeof (d) != "object"){
+                    text.push(getTimeFormatforSlider(new Date(d)));
+                }
+                else
+                    text.push(getTimeFormatforSlider(d));
+            });
+            d3.select('p#value-simple').text(text.join(' - '));
+        });
+
+    var gRange = d3
+        .select('div#slider-simple')
+        .append('svg')
+        .attr('width', 400)
+        .attr('height', 40)
+        .append('g')
+        .attr('transform', 'translate(30,30)');
+
+    gRange.call(sliderRange);
+
+    d3.select('p#value-simple').text(
+        sliderRange.value().map(d=>{return getTimeFormatforSlider(d)})
+            .join(' - ')
+    );
+}
 
 
 
@@ -126,21 +205,30 @@ function drawMap(data) {
         });
 
     // Draw hospital
-    group.selectAll("hospitals").data(hospitals)
+    group.selectAll("geoHospitals").data(hospitals)
         .enter()
         .append("circle")
-        .attr("class","hospitals")
+        .attr("class","geoHospitals")
         .attr("cx",d=>projection(d.position)[0])
-        .attr("cy",d=>projection(d.position)[1])
-        .attr("r",5)
-        .attr("fill","red");
+        .attr("cy",d=>projection(d.position)[1]);
 
     group.append("circle")
-        .attr("id","nuclear")
+        .attr("class","geoNuclear")
         .attr("cx",d=>projection(nuclearPlant)[0])
-        .attr("cy",d=>projection(nuclearPlant)[1])
-        .attr("r",12)
-        .attr("fill","#fcd80f")
+        .attr("cy",d=>projection(nuclearPlant)[1]);
+
+    // have circle and text
+    var gGeoLabel = group.append("g").attr("transform","translate("+100+","+(geoHeight-125)+")");
+
+    // hospital circle
+    gGeoLabel.append("circle").attr("class","geoHospitals").attr("cx",0).attr("cy",0);
+    gGeoLabel.append("text").attr("x",15).attr("y",4).text("Hospitals");
+
+    // hospital circle
+    gGeoLabel.append("circle").attr("class","geoNuclear").attr("cx",0).attr("cy",25);
+    gGeoLabel.append("text").attr("x",15).attr("y",30).text("Nuclear plant");
+
+
 
 }
 

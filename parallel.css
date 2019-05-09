@@ -1,5 +1,5 @@
 svg {
-    font: 10px Times;
+    font: 15px Times;
 }
 
 .background path {
@@ -176,4 +176,15 @@ div.tooltip {
     border: 0px;
     border-radius: 8px;
     pointer-events: none;
+}
+
+.geoNuclear{
+    fill: #fcce1f;
+    stroke: black;
+    r: 12px;
+}
+
+.geoHospitals{
+    fill: red;
+    r: 5px
 }
