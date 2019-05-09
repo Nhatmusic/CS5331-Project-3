@@ -25,12 +25,12 @@ var boxplotXAxis = d3.axisBottom(boxplotX).ticks(5),
 //drag object
 // var dragging = {};
 
-const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
-const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
-const observeTime = d3.timeParse("%m/%d/%Y %H");
+// const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+// const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
+// const observeTime = d3.timeParse("%m/%d/%Y %H");
 
-var features = [];
-d3.csv("data/mc1-reports-data.csv",function (err, rows) {
+// var features = [];
+d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
 
     rows.forEach(row=>{
         row.time = observeTime(formatDayAndHour(parseTime(row.time)));
