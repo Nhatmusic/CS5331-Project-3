@@ -80,42 +80,44 @@ d3.csv("data/mc1-reports-data.csv",function (err, rows) {
         .attr("class", "grid").call(boxplotYAxis);
 
     // draw axis
-    drawLine(boxplot,"sewer_and_water",1);
+    drawLine(boxplot,"power","1");
 
 });
 
-var outer_opacity = 0.1;
+var outer_opacity = 0.5;
+
 function drawLine(boxplot,property,location) {
     var data = [];
     boxplot.forEach(d=>{
-        if(d.location == location && (property in d)){
+        if(d.location === location && (property in d)){
+            // data.push({time: new Date(d.time), value: d[property].max});
             data.push(d);
         }
     });
-    console.log(data);
+    // console.log(data);
 
 
-    // var areaInner = d3.area()
-    //     .x(d=>boxplotX(d.time))
-    //     .y0(d=>boxplotY(d[property].upperInnerFence))
-    //     .y1(d=>boxplotY(d[property].lowerInnerFence))
-    //     .curve(d3.curveCatmullRom.alpha(0.5));
+    var areaOuter = d3.area()
+        .x(d=>boxplotX(new Date(d.time)))
+        .y0(d=>boxplotY(d[property].upperInnerFence))
+        .y1(d=>boxplotY(d[property].lowerInnerFence))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+    var drawAbove = boxplotG.append("path").datum(data)
+        .attr("fill","#fcc29b").style("opacity",outer_opacity)
+        .attr("d", areaOuter);
     //
-    // var drawAbove = boxplotG.append("path").datum(data)
-    //     .attr("fill","#fcc29b").style("opacity",outer_opacity)
-    //     .attr("d", areaInner);
-    //
-    // var areaQ3 = d3.area()
-    //     .x(d=>{
-    //         console.log(d.lowerInnerFence + ", " + d.quartile1+", "+d.quartile3 +", "+d.median + ", " + d.upperInnerFence);
-    //         return boxplotX(d.time);})
-    //     .y0(d=>boxplotY(d[property].quartile1))
-    //     .y1(d=>boxplotY(d[property].quartile3))
-    //     .curve(d3.curveCatmullRom.alpha(0.5));
-    //
-    // var drawAbove = boxplotG.append("path").datum(data)
-    //     .attr("fill","#fcc29b").style("opacity",outer_opacity)
-    //     .attr("d", areaQ3);
+    var areaInner = d3.area()
+        .x(d=>{
+            // console.log(d.lowerInnerFence + ", " + d.quartile1+", "+d.quartile3 +", "+d.median + ", " + d.upperInnerFence);
+            return boxplotX(new Date(d.time))})
+        .y0(d=>boxplotY(d[property].quartile1))
+        .y1(d=>boxplotY(d[property].quartile3))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+    var drawAbove = boxplotG.append("path").datum(data)
+        .attr("fill","#fcc29b").style("opacity",outer_opacity)
+        .attr("d", areaInner);
 
     // var areaQ1 = d3.area()
     //     .x(d=>{ return boxplotX(d.time);})
@@ -128,11 +130,13 @@ function drawLine(boxplot,property,location) {
     //     .attr("d", areaQ1);
     //
     var boxplotLine = d3.line().x(d=>{
-        console.log(new Date(d.time));
-        boxplotX(new Date(d.time))}).y(d=>boxplotY(5)).curve(d3.curveCatmullRom.alpha(0.5));
+        // console.log(d);
+        return boxplotX(new Date(d.time))})
+        .y(d=>boxplotY(d[property].median))
+        .curve(d3.curveCatmullRom.alpha(0.5));
 
     var boxplotPath = boxplotG.append("path").datum(data)
-    // .attr("stroke","black")
+        .attr("stroke","black")
         .attr("fill","none")
         .attr("d",boxplotLine)
 
