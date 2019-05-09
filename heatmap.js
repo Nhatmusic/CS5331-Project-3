@@ -57,7 +57,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
     var classesNumber = 9,
         cellSize = 10,
-        viewerWidth = 1200,
+        viewerWidth = 1000,
         viewerHeight = 4000,
         viewerPosTop = 100,
         viewerPosLeft = 100,
@@ -125,10 +125,10 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             return "rowLabel_" + i;
         })
         .on('mouseover', function (d, i) {
-            d3.select(this).classed("hover", true);
+            d3.select(this).style("font-size","10px").classed("hover", true);
         })
         .on('mouseout', function (d, i) {
-            d3.select(this).classed("hover", false);
+            d3.select(this).style("font-size","5px").classed("hover", false);
         });;
 
     var rows = maing.selectAll(".row")

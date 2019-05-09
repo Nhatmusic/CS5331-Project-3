@@ -21,8 +21,8 @@ svg {
     /*border: 1px solid black;*/
     position:absolute;
     top: 800px;
-    width:1200px;
-    height:4000px;
+    width:1000px;
+    height:1400px;
 }
 .foreground path {
     fill: none;
@@ -241,7 +241,7 @@ h3 {
 }
 
 text.hover {
-    font-size: 18px;
+    font-size: 30px;
     font-weight: bold;
     fill: #66F;
     font-background: #000;
