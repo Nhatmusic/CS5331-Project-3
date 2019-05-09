@@ -1,6 +1,6 @@
 var dataset = [];
-var topCategoriesAll = [];           // Must not be greater than the size of our precomputed
-var topCategories20 = [];            // t-SNE result if we are using it
+var topCategoriesAll = [];
+var topCategories20 = [];
 
 let features = [];
 var selectedCategories = [];
@@ -16,6 +16,7 @@ d3.csv("./Dataset/data-optimized.csv")
         return d;
     })
     .get(function (error, rows) {
+
         dataset = rows;
         dataset.columns = rows.columns;
         console.log(dataset.columns);
