@@ -7,6 +7,7 @@ var selectedCategories = [];
 var categories = [];
 var categoriesByTimeSpan = {};
 
+
 //Time Format and Parsing
 const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
 const formatTimeDay = d3.timeFormat("%d");

@@ -11,6 +11,34 @@ var hospitals = [
     {name: 8,position: [-119.744800, 0.065250]}];
 var nuclearPlant = [-119.784825,0.162679];
 
+var neighborHood = [
+    {name: "PALACE HILLS",position: [-119.975400, 0.165560]},
+    {name: "NORTHWEST",position: [-119.930400, 0.183860]},
+    {name: "OLD TOWN",position: [-119.873400, 0.193060]},
+    {name: "SAFE TOWN",position: [-119.820400, 0.167060]},
+    {name: "SOUTH WEST",position: [-119.930400, 0.110060]},
+    {name: "DOWNTOWN",position: [-119.930400, 0.140060]},
+    {name: "WILSON FOREST",position: [-119.730400, 0.088060]},
+    {name: "SCENIC VISTA",position: [-119.780400, 0.032060]},
+    {name: "BROADVIEW’s",position: [-119.843400, 0.052060]},
+    {name: "CHAPPARAL’s",position: [-119.803400, 0.052060]},
+    {name: "TERRAPIN SPRINGS",position: [-119.770400, 0.073060]},
+    {name: "PEPPER MILL’s",position: [-119.765400, 0.103060]},
+    {name: "CHEDDARFORD’s",position: [-119.811400, 0.106060]},
+    {name: "EASTON",position: [-119.870800, 0.153120]},
+    {name: "WESTON",position: [-119.898520, 0.151090]},
+    {name: "SOUTHTON",position: [-119.900400, 0.119060]},
+    {name: "OAK WILLOW",position: [-119.853400, 0.083060]},
+    {name: "EAST PARTON",position: [-119.843400, 0.117060]},
+    {name: "WEST PARTON",position: [-119.876400, 0.106060]}];
+
+var checkedNeighborhood = [];
+
+const GEO_OPACITY_DEFAULT = 0.3;
+const GEO_OPACITY_HOVER = 0.7;
+
+const NORMAL_STROKE_WIDTH = 1;
+const BIGER_STROKE_WIDTH = 3;
 
 var geoWidth = 900;
 var geoHeight = 600;
@@ -219,12 +247,14 @@ function updateGeoFill() {
     });
 }
 
+function innitialize() {
+
+    checkedNeighborhood = ["1","3","5","7"];
+
+}
 
 // Draw the geospatial diagram
 function drawMap(data) {
-
-    const GEO_OPACITY_DEFAULT = 0.7;
-    const GEO_OPACITY_HOVER = 0.3;
 
     //Draw Map
     group.selectAll("path").data(data)
@@ -250,13 +280,30 @@ function drawMap(data) {
                     " - buildings: " + averageLocationDamage[indexInTotal].buildings +
                     " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
 
-            d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_HOVER);
+            d3.select("#geo"+d.properties.Id).attr("stroke-width",BIGER_STROKE_WIDTH);
         })
         .on("mouseout",d=>{
             d3.select(".textLabel").remove();
             d3.select(".textLabel2").remove();
-            d3.select("#geo"+d.properties.Id).style("fill-opacity",GEO_OPACITY_DEFAULT);
-        });
+
+            d3.select("#geo"+d.properties.Id).attr("stroke-width",NORMAL_STROKE_WIDTH);
+
+        })
+        .on("click",d=>{
+            var id = d.properties.Id.toString();
+            if(!checkedNeighborhood.includes(id)){
+                checkedNeighborhood.push(id);
+                d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
+                d3.select("#svg"+id).transition().duration(1000).style("display",null);
+            }
+            else {
+                checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
+                d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
+                d3.select("#svg"+id).transition().duration(1000).style("display","none");
+            }
+
+
+        })
 
     // Draw hospital
     group.selectAll("geoHospitals").data(hospitals)
@@ -271,6 +318,23 @@ function drawMap(data) {
         .attr("class","geoNuclear")
         .attr("cx",d=>projection(nuclearPlant)[0])
         .attr("cy",d=>projection(nuclearPlant)[1]);
+
+    // Draw neighborhood text
+    group.selectAll("neighborText").data(neighborHood)
+        .enter()
+        .append("text").attr("font-size","10px")
+        .attr("x",d=>projection(d.position)[0])
+        .attr("y",d=>projection(d.position)[1])
+        .attr("transform", d=>{
+            if(d.name == "WILSON FOREST")
+                return "translate(230,990) rotate(-90)";
+            else if(d.name == "CHAPPARAL’s")
+                return "translate(30,908) rotate(-90)";
+            else if(d.name == "SCENIC VISTA")
+                return "translate(-150,255) rotate(-25)";
+            return null;
+        })
+        .text(d=>d.name);
 
     // have circle and text
     var gGeoLabel = group.append("g").attr("transform","translate("+100+","+(geoHeight-125)+")");

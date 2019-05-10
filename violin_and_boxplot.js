@@ -1,5 +1,5 @@
 // Info to show visualization
-var boxplotWidth = 1300, boxplotHeight = 400,
+var boxplotWidth = 900, boxplotHeight = 300,
     boxplotMargin = {top: 30, right: 20, bottom: 30, left: 50},
     boxplotContentWidth = boxplotWidth - boxplotMargin.left - boxplotMargin.right,
     boxplotContentHeight = boxplotHeight - boxplotMargin.top - boxplotMargin.bottom;
@@ -42,6 +42,7 @@ d3.csv("Dataset/data-optimized.csv",function (err, rows) {
     databyLocation.forEach(d=>{
         locations.push(d.key);
     });
+    locations.sort((a,b)=>(+a) - (+b)); // sort data by convert String to number
 
     // console.log(dataByTime.length);
 
@@ -78,6 +79,7 @@ d3.csv("Dataset/data-optimized.csv",function (err, rows) {
         generateLocationSvg(boxplot,loc);
     });
 
+    // d3.select("#svg2").style("display","none");
 
 });
 
@@ -114,7 +116,7 @@ function generateLocationSvg(boxplot,location) {
 
     // Append title of graph
     g.append("text").attr("x",50).attr("y",10)
-        .text("Location "+location)
+        .text("Location "+location+ " - " + neighborHood[+location-1].name)
         .style("font-size","25px");
 
 }
