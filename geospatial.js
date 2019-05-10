@@ -35,10 +35,6 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 
 var initialData;
 
-var averageLocationDamageObj = {};
-var averageLocationDamage = [];
-var locationList = [];
-var featuresGeo = [];
 d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
 
@@ -82,21 +78,25 @@ var featuresGeo = [];
 // Format the data by location and analyze the damage for each location
 function analyzeDataByLocation(data) {
     // Get columns of data
-    featuresGeo = data.columns.slice(1,8);
-
+    //featuresGeo = data.columns.slice(1,8);
+    featuresGeo = data.columns.filter(d => d !== "time" && d !== "reportID");
+    
     // nest data by location
     //update boxplot
     var dataByLocation = d3.nest().key(d=>d.location).entries(data);
 
     // Calculate total/average damage for each location
     dataByLocation.forEach(location=>{
-        var totalDamage = 0;
-        var featureDamage = [0,0,0,0,0,0];
+        let totalDamage = 0;
+        let featureDamage = [];
         location.values.forEach(d=>{
-            featuresGeo.forEach((feature,i)=>{
-                totalDamage += +d[feature];
-                if(feature!=="location")
-                    featureDamage[i] += +d[feature];
+            featuresGeo.forEach((feature)=>{
+                if(feature !== "location")
+                    if (!featureDamage.hasOwnProperty(feature)) {
+                        featureDamage[feature] = 0;
+                    }
+                    totalDamage += +d[feature];
+                    featureDamage[feature] += +d[feature];
             })
         });
 
@@ -106,18 +106,18 @@ function analyzeDataByLocation(data) {
         averageLocationDamage.push({location: location.key,
             totalDamage: totalDamage,
             nReports: location.values.length,
-            averagedamage: Math.round(totalDamage/location.values.length),
-            sewer_and_water:(featureDamage[0]/location.values.length).toFixed(1),
-            power:(featureDamage[1]/location.values.length).toFixed(1),
-            roads_and_bridges:(featureDamage[2]/location.values.length).toFixed(1),
-            medical:(featureDamage[3]/location.values.length).toFixed(1),
-            buildings:(featureDamage[4]/location.values.length).toFixed(1),
-            shake_intensity:(featureDamage[5]/location.values.length).toFixed(1)
+            averagedamage: Math.round(totalDamage / location.values.length),
+            sewer_and_water: (featureDamage["sewer_and_water"] / location.values.length).toFixed(1),
+            power: (featureDamage["power"] / location.values.length).toFixed(1),
+            roads_and_bridges: (featureDamage["roads_and_bridges"] / location.values.length).toFixed(1),
+            medical: (featureDamage["medical"] / location.values.length).toFixed(1),
+            buildings: (featureDamage["buildings"] / location.values.length).toFixed(1),
+            shake_intensity: (featureDamage["shake_intensity"] / location.values.length).toFixed(1)
         });
     });
 
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
-    GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
+    GeoColor.domain(d3.extent(averageLocationDamage, function(d) { return d.averagedamage; }));
 }
 
 function getTimeFormatforSlider(time) {
@@ -137,7 +137,6 @@ function getTimeFormatforSlider(time) {
 function drawGeoSlider(data) {
 
     var dataFullTime = [];
-    let temp = data[0];
 
     // console.log(typeof (new Date(temp)));
     data.map(d=>{dataFullTime.push(new Date(d))});
