@@ -58,7 +58,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     var classesNumber = 9,
         cellSize = 10,
         viewerWidth = 1000,
-        viewerHeight = 4000,
+        viewerHeight = 2000,
         viewerPosTop = 100,
         viewerPosLeft = 100,
         viewerPosBot = 300,
@@ -89,7 +89,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     // create svg for group of LOCATION
      maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
-        .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * viewerHeight / 80})`)
+        .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * 50})`)
         .attr("id", function (d, i) {
             return "location" + i
         })
@@ -169,7 +169,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("stroke","black")
 
         .on('mouseover', function (cell) {
-                tooltip.html('<div class="heatmap_tooltip">' + "Report Quantity: " + cell.report +  "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
+                tooltip.html('<div class="heatmap_tooltip">' + "Location: " + cell.location +  "<br/>"+ "Report Quantity: " + cell.report +  "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
                 tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
@@ -177,7 +177,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 880) + "px").style("left", (d3.event.pageX - 60) + "px");
+            tooltip.style("top", (d3.event.pageY - 910) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
 
     var legend = svg.append("g")

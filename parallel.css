@@ -259,6 +259,7 @@ text.hover {
     font-size: 10px;
     position: absolute;
     top: 40px;
+    left: 100px;
     cursor: pointer;
 }
 
@@ -273,6 +274,7 @@ text.hover {
     font-size: 10px;
     position: absolute;
     top: 70px;
+    left: 100px;
     cursor: pointer;
 }
 
