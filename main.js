@@ -11,7 +11,7 @@ var categoriesByTimeSpan = {};
 const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
 const formatTime = d3.timeFormat("%d");
 
-d3.csv("./Dataset/data-optimized.csv")
+d3.csv("./Dataset/data-optimized1.csv")
     .row(function (d) {
         return d;
     })
