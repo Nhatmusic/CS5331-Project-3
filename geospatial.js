@@ -32,7 +32,7 @@ var neighborHood = [
     {name: "EAST PARTON",position: [-119.843400, 0.117060]},
     {name: "WEST PARTON",position: [-119.876400, 0.106060]}];
 
-var checkedNeighborhood = [];
+var checkedNeighborhood = ["1","3","5","7"];
 
 const GEO_OPACITY_DEFAULT = 0.3;
 const GEO_OPACITY_HOVER = 0.7;
@@ -98,8 +98,10 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
 
         // console.log(geojson);
         drawMap(geojson.features);
-
+        initialize();
     });
+
+
 });
 
 var averageLocationDamageObj;
@@ -247,11 +249,6 @@ function updateGeoFill() {
     });
 }
 
-function innitialize() {
-
-    checkedNeighborhood = ["1","3","5","7"];
-
-}
 
 // Draw the geospatial diagram
 function drawMap(data) {
@@ -266,10 +263,11 @@ function drawMap(data) {
         .attr("fill-opacity",GEO_OPACITY_DEFAULT)
         .attr("stroke","#222")
         .on("mouseover",d=>{
-            var indexInTotal = findIndexInArrayObject(averageLocationDamage,d.properties.Id);
+            var id = d.properties.Id;
+            var indexInTotal = findIndexInArrayObject(averageLocationDamage,id);
 
             group.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
-                .text("Id: " + d.properties.Id + " - "+d.properties.Nbrhood +
+                .text("Id: " + id + " - "+d.properties.Nbrhood +
                     ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
                     ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
             group.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
@@ -280,13 +278,15 @@ function drawMap(data) {
                     " - buildings: " + averageLocationDamage[indexInTotal].buildings +
                     " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
 
-            d3.select("#geo"+d.properties.Id).attr("stroke-width",BIGER_STROKE_WIDTH);
+            d3.select("#geo"+id).attr("stroke-width",BIGER_STROKE_WIDTH);
+
         })
         .on("mouseout",d=>{
+            var id = d.properties.Id;
             d3.select(".textLabel").remove();
             d3.select(".textLabel2").remove();
 
-            d3.select("#geo"+d.properties.Id).attr("stroke-width",NORMAL_STROKE_WIDTH);
+            d3.select("#geo"+id).attr("stroke-width",NORMAL_STROKE_WIDTH);
 
         })
         .on("click",d=>{
@@ -295,13 +295,14 @@ function drawMap(data) {
                 checkedNeighborhood.push(id);
                 d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
                 d3.select("#svg"+id).transition().duration(1000).style("display",null);
+                graphByCategory([id],ADD_CODE);
             }
             else {
                 checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
                 d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
                 d3.select("#svg"+id).transition().duration(1000).style("display","none");
+                graphByCategory([id],DELETE_CODE);
             }
-
 
         })
 
@@ -323,6 +324,7 @@ function drawMap(data) {
     group.selectAll("neighborText").data(neighborHood)
         .enter()
         .append("text").attr("font-size","10px")
+        .attr("id",d=>"locationText"+d.name)
         .attr("x",d=>projection(d.position)[0])
         .attr("y",d=>projection(d.position)[1])
         .attr("transform", d=>{

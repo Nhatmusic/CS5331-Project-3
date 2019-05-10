@@ -79,9 +79,18 @@ d3.csv("Dataset/data-optimized.csv",function (err, rows) {
         generateLocationSvg(boxplot,loc);
     });
 
-    // d3.select("#svg2").style("display","none");
+    initialize();
 
 });
+
+function initialize() {
+
+    checkedNeighborhood.forEach(id=>{
+        d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
+        d3.select("#svg"+id).transition().duration(1000).style("display",null);
+    })
+
+}
 
 // Generate svg, g, and lines
 function generateLocationSvg(boxplot,location) {
@@ -119,11 +128,13 @@ function generateLocationSvg(boxplot,location) {
         .text("Location "+location+ " - " + neighborHood[+location-1].name)
         .style("font-size","25px");
 
+    svg.style("display","none");
+
 }
 
 var outer_opacity = 0.3;
-const normal_stroke_width = 2;
-const hover_strok_width = 4 ;
+const normal_line_stroke_width = 2;
+const hover_line_stroke_width = 4 ;
 
 // Draw line graph
 function drawLine(boxplot,property,location) {
@@ -179,7 +190,7 @@ function drawLine(boxplot,property,location) {
         .attr("class","boxplot"+location)
         .attr("id","line"+property+location)
         .attr("stroke",thisColor)
-        .attr("stroke-width",normal_stroke_width)
+        .attr("stroke-width",normal_line_stroke_width)
         .attr("fill","none")
         .attr("d",boxplotLine)
         .on("mouseover",d=>MouseOver(d))
@@ -202,7 +213,7 @@ function MouseOver(data) {
     console.log(data[0].location);
     boxplotFeatures.forEach(d=>{
         if(d==data[0].feature){
-            d3.select("#line"+d+data[0].location).attr("stroke-width",hover_strok_width);
+            d3.select("#line"+d+data[0].location).attr("stroke-width",hover_line_stroke_width);
             d3.select("#innerArea"+d+data[0].location).attr("filter",null);
             d3.select("#outerArea"+d+data[0].location).attr("filter",null);
         }
@@ -220,7 +231,7 @@ function MouseOut(data){
     var location = data[0].location;
     boxplotFeatures.forEach(d=> {
         if (d == data[0].feature) {
-            d3.select("#line" + data[0].feature + data[0].location).attr("stroke-width", normal_stroke_width);
+            d3.select("#line" + data[0].feature + data[0].location).attr("stroke-width", normal_line_stroke_width);
             d3.select("#innerArea" + data[0].feature + data[0].location).attr("filter", "url(#innerFilter"+location+")");
           d3.select("#outerArea" + data[0].feature + data[0].location).attr("filter", "url(#outerFilter"+location+")");
         } else {
