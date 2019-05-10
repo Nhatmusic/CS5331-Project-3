@@ -117,15 +117,33 @@ function generateLocationSvg(boxplot,location) {
 
     // Draw lines
     boxplotFeatures.forEach(feature=>{
-        console.log(feature);
+        // console.log(feature);
         drawLine(boxplot,feature,location);
     });
+    // console.log(boxplotFeatures);
 
     // Append title of graph
     g.append("text").attr("x",50).attr("y",-5)
         .text("Location "+location+ " - " + neighborHood[+location-1].name)
         .style("font-size","8px");
 
+    // Draw Legend for features
+    var legend = svg.append("g").attr("id","legend")
+        .attr("transform", "translate(" + boxplotMargin.left + ",10)");
+
+    legend.selectAll(".legendRect").data(boxplotFeatures).enter().append("rect").attr("class","legendRect")
+        .attr("x", (d,i)=>i*80)
+        .attr("y", 0).attr("width", 5).attr("height",5)
+        .attr("fill", d=>{
+            return boxplotColor(d)});
+
+    legend.selectAll(".legendText").data(boxplotFeatures).enter().append("text").attr("class","legendText")
+        .attr("x", (d,i)=>i*80+10)
+        .attr("y", 5).text(d=>d)
+        .style("font-size","8px")
+
+
+    // hide the svg
     svg.style("display","none");
 
 }
