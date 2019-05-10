@@ -153,8 +153,8 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("y", function (cell,i) {
             return i * (cellSize+4) / 2;
         })
-        .attr("rx", 2)
-        .attr("ry", 2)
+        // .attr("rx", 2)
+        // .attr("ry", 2)
         .attr("class", function (cell, i) {
             return "cell " + i + " loc " +cell.location;
         })
@@ -213,6 +213,14 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         })
         .attr("y", 130);
 
+    var y = d3.scaleLinear().range([945, 0]).domain([19.5,0.5]);
+    // Add the y Axis
+    svg.append("g").attr("class","y_axis")
+        .attr("transform", "translate(50," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19));
+
+
+
 
 });
 
@@ -226,10 +234,25 @@ svg.transition().duration(3000).selectAll(".cell")
                 return d.type*160-(d.location - 1) * 43;
             }
         });
-maing.selectAll("text").remove()
+
+    var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
+    var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
+    // Add the y Axis
+    svg.append("g").attr("class","label_axis")
+        .attr("transform", "translate(80," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return label[d]; }));
+maing.selectAll("text").remove();
+svg.select(".y_axis").remove();
 }
 
 function showdatabylocation() {
+    svg.select(".label_axis").remove();
+    maing.selectAll("text").remove()
+    var y = d3.scaleLinear().range([945, 0]).domain([19.5,0.5]);
+    // Add the y Axis
+    svg.append("g").attr("class","y_axis")
+        .attr("transform", "translate(50," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19));
     var cellSize=10;
     rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
         .attr("y", function (cell,i) {
@@ -261,5 +284,5 @@ function showdatabylocation() {
         })
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size","5px").classed("hover", false);
-        });;
+        });
 }
