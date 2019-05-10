@@ -124,7 +124,7 @@ function generateLocationSvg(boxplot,location) {
 
     // Append title of graph
     g.append("text").attr("x",50).attr("y",-5)
-        .text("Location "+location+ " - " + neighborHood[+location-1].name)
+        .text("Location " + neighborHood[+location-1].name)
         .style("font-size","8px");
 
     // Draw Legend for features
