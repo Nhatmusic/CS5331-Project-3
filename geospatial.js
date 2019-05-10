@@ -189,10 +189,23 @@ function drawGeoSlider(data) {
     );
 }
 
+
+
 var selectedGeoData;
 function filterGeoTimeRange(timeRange) {
     selectedGeoData = initialData.filter(function(d) {
         return timeRange[0] <= d.time && d.time <= timeRange[1];
+    });
+    selectedGeoData.columns = initialData.columns;
+    
+    analyzeDataByLocation(selectedGeoData);
+    updateGeoFill();
+    updateParallelByTime(timeRange);
+}
+
+function filterGeoTimeSpan(timeSpan) {
+    selectedGeoData = initialData.filter(function(d) {
+        return +formatTimeDay(RoundTimeDay(d.time)) === timeSpan;
     });
     selectedGeoData.columns = initialData.columns;
     

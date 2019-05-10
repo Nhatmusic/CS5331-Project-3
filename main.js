@@ -9,7 +9,35 @@ var categoriesByTimeSpan = {};
 
 //Time Format and Parsing
 const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
-const formatTime = d3.timeFormat("%d");
+const formatTimeDay = d3.timeFormat("%d");
+
+// Takes a date object and rounds it down to the nearest hour
+function RoundTimeDay(dateObject) {
+    let timeStampUTC = +dateObject; // Convert the date object to a UTC timestamp in milliseconds
+    
+    // Account for the Central Time locale offset
+    // Subtract the 5-hour difference to ensure rounding by Central Time and not UTC
+    timeStampUTC -=     1000    *  // 1 second - 1000 milliseconds
+        60      *  // 1 minute - 60 seconds
+        60      *  // 1 hour   - 60 minutes
+        5;         // 5 hours
+    
+    // Subtract the remainder down to the nearest hour
+    timeStampUTC -= (timeStampUTC) %
+        (   1000    *  // 1 second - 1000 milliseconds
+            60      *  // 1 minute - 60 seconds
+            60      *  // 1 hour   - 60 minutes
+            24);       // 1 day    - 24 hours
+    
+    // Account for the Central Time locale offset
+    // Add the 5-hour difference to ensure that the proper Central Time value is displayed
+    timeStampUTC +=     1000    *  // 1 second - 1000 milliseconds
+                        60      *  // 1 minute - 60 seconds
+                        60      *  // 1 hour   - 60 minutes
+                        5;         // 5 hours
+    
+    return new Date(timeStampUTC);
+}
 
 d3.csv("./Dataset/data-optimized.csv")
     .row(function (d) {
@@ -30,7 +58,7 @@ d3.csv("./Dataset/data-optimized.csv")
 
         // Doing Time Slider
         dataset.forEach(d => {
-            var timeSpan = d.time = +formatTime(parseTimeGeo(d.time));
+            var timeSpan = d.time = +formatTimeDay(parseTimeGeo(d.time));
             features.forEach(feature => {
                 if (feature !== "location")
                     d[feature] = +d[feature];

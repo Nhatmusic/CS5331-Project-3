@@ -61,10 +61,10 @@ function drawSlider() {
         .on('onchange', val => {
             d3.select('p#value-time').text((val));
 
-            graphByTimeSpan(dataset,sliderTime.value());
-
             legendisClicked = false; //set legend off-click
+            
             graphByTimeSpan(dataset, sliderTime.value());
+            filterGeoTimeSpan(sliderTime.value());
         });
 
     var gTime = d3
@@ -85,6 +85,7 @@ function resetAll() {
     d3.select("svg#slider").remove();
     drawSlider();
     graphByTimeSpan(dataset, sliderTime.value());
+    filterGeoTimeSpan(sliderTime.value());
     addCheckBoxes(categories);
     document.getElementById("slider").style.display = "block";
     document.getElementById("categoryContainer").style.display = "none";
@@ -100,7 +101,7 @@ function chooseOption() {
         timeSpanChart.style.display = "block";
         categoryChart.style.display = "none";
         graphByTimeSpan(dataset, sliderTime.value());
-
+        filterGeoTimeSpan(sliderTime.value());
     }
 
     if (categoryChoice.checked) {
@@ -165,6 +166,14 @@ function addCheckBoxes(array) {
     })
 }
 
+function updateParallelByTime(timeRange) {
+    let selectedData;
+    selectedData = dataset.filter(function(d) {
+        return timeRange[0] <= d.time && d.time <= timeRange[1];
+    });
+    drawGraph(selectedData, null, locationList);
+}
+
 function graphByTimeSpan(data, timeSpan) {
     var selectedSongs = [];
     data.forEach(d => {
@@ -190,6 +199,8 @@ function drawGraph(songs, timeSpan, selectedCategories) {
         // Add Scale for each axis
         if (d == "location") {
             if (timeSpan == 0)
+                yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedCategories);
+            else if (selectedCategories)
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(selectedCategories);
             else
                 yScale[d] = d3.scalePoint().range([parallelContentHeight, 0]).domain(categoriesByTimeSpan[timeSpan]);
