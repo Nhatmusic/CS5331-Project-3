@@ -33,11 +33,9 @@ const parseTimeGeo = d3.timeParse("%Y-%m-%d %H:%M:%S");
 const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
 const observeTime = d3.timeParse("%m/%d/%Y %H");
 
+var initialData;
 
-var averageLocationDamageObj = {};
-var averageLocationDamage = [];
-var locationList = [];
-var featuresGeo = [];
+// Get the data from the CSV and format it to our needs
 d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
 
@@ -45,18 +43,14 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
         // console.log(row.time);
     });
+    
+    // Save the initial data for later use
+    initialData = rows;
+    initialData.columns = rows.columns;
 
-    // Get columns of data
-    featuresGeo = rows.columns.slice(1,8);
-
-
-    // time range
+    // time range           // We don't appear to be using this
     var timeRange = d3.extent(rows,d=>{return d.time});
     // console.log(timeRange);
-
-    // nest data by location
-    //update boxplot
-    var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
 
     //nest data by time and sort data
     var dataByTime = d3.nest().key(d=>d.time).entries(rows);
@@ -67,7 +61,30 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     dataByTime.map(d=>{time.push(d.key)});
     drawGeoSlider(time);
 
-    // Handle dataByLocation
+    analyzeDataByLocation(rows);
+    
+    d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
+
+        // console.log(geojson);
+        drawMap(geojson.features);
+
+    });
+});
+
+var averageLocationDamageObj = {};
+var averageLocationDamage = [];
+var locationList = [];
+var featuresGeo = [];
+// Format the data by location and analyze the damage for each location
+function analyzeDataByLocation(data) {
+    // Get columns of data
+    featuresGeo = data.columns.slice(1,8);
+    
+    // nest data by location
+    //update boxplot
+    var dataByLocation = d3.nest().key(d=>d.location).entries(data);
+    
+    // Calculate total/average damage for each location
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
         var featureDamage = [0,0,0,0,0,0];
@@ -78,8 +95,8 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
                     featureDamage[i] += +d[feature];
             })
         });
-
-
+        
+        
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
         averageLocationDamage.push({location: location.key,
@@ -94,17 +111,10 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             shake_intensity:(featureDamage[5]/location.values.length).toFixed(1)
         });
     });
-
+    
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
     GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
-    d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
-
-        // console.log(geojson);
-        drawMap(geojson.features);
-
-    });
-
-});
+}
 
 function getTimeFormatforSlider(time) {
     var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -119,6 +129,7 @@ function getTimeFormatforSlider(time) {
         + time.getHours() + ":0" + time.getMinutes();
 }
 
+// Draw the time slider
 function drawGeoSlider(data) {
 
     var dataFullTime = [];
@@ -167,7 +178,7 @@ function drawGeoSlider(data) {
 }
 
 
-
+// Draw the geospatial diagram
 function drawMap(data) {
 
     const GEO_OPACITY_DEFAULT = 0.7;
@@ -213,6 +224,7 @@ function drawMap(data) {
         .attr("cx",d=>projection(d.position)[0])
         .attr("cy",d=>projection(d.position)[1]);
 
+    // Draw the nuclear plant
     group.append("circle")
         .attr("class","geoNuclear")
         .attr("cx",d=>projection(nuclearPlant)[0])
