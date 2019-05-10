@@ -62,8 +62,10 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     dataByTime.map(d=>{time.push(d.key)});
     drawGeoSlider(time);
 
+    // Take in the data and process it for the Geospatial Diagram
     analyzeDataByLocation(rows);
 
+    // Process the GeoJSON map file for rendering the Geospatial Diagram
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
 
         // console.log(geojson);
@@ -72,12 +74,18 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     });
 });
 
-var averageLocationDamageObj = {};
-var averageLocationDamage = [];
-var locationList = [];
-var featuresGeo = [];
+var averageLocationDamageObj;
+var averageLocationDamage;
+var locationList;
+var featuresGeo;
 // Format the data by location and analyze the damage for each location
 function analyzeDataByLocation(data) {
+    // Clear the data each time this is called
+    averageLocationDamageObj = {};
+    averageLocationDamage = [];
+    locationList = [];
+    featuresGeo = [];
+    
     // Get columns of data
     //featuresGeo = data.columns.slice(1,8);
     featuresGeo = data.columns.filter(d => d !== "time" && d !== "reportID");
@@ -162,6 +170,7 @@ function drawGeoSlider(data) {
                     text.push(getTimeFormatforSlider(d));
             });
             d3.select('p#value-simple').text(text.join(' - '));
+            filterGeoTimeRange(val);
         });
 
     var gRange = d3
@@ -178,6 +187,23 @@ function drawGeoSlider(data) {
         sliderRange.value().map(d=>{return getTimeFormatforSlider(d)})
             .join(' - ')
     );
+}
+
+var selectedGeoData;
+function filterGeoTimeRange(timeRange) {
+    selectedGeoData = initialData.filter(function(d) {
+        return timeRange[0] <= d.time && d.time <= timeRange[1];
+    });
+    selectedGeoData.columns = initialData.columns;
+    
+    analyzeDataByLocation(selectedGeoData);
+    updateGeoFill();
+}
+
+function updateGeoFill() {
+    locationList.forEach(function(location) {
+        d3.select("#geo" + +location).attr("fill", function() { return GeoColor(averageLocationDamageObj[+location])})
+    });
 }
 
 
