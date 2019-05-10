@@ -44,3 +44,9 @@ Provide your answer and corresponding images here.
 Reports of "medical" damage (or lack thereof) coincides with the presence of hospitals in the area
 
 ![Hospitals and Medical Damage](images/observations/medical-damage-and-hospitals.png)
+
+## Answer questions
+1)
+2) In this question, we use mean and quartiles to focus on uncertainty of each damgage feature on each location. With the line graph, we make some blur for the range of quartiles, which means further from mean, the more blur in the line graph.</br> 
+![Location 11 - Terrapin Springs](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/observations/location%2011%20-%20line%20graph.png)
+ 
