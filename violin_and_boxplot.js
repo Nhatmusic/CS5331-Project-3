@@ -131,13 +131,15 @@ function generateLocationSvg(boxplot,location) {
     var legend = svg.append("g").attr("id","legend")
         .attr("transform", "translate(" + boxplotMargin.left + ",10)");
 
-    legend.selectAll(".legendRect").data(boxplotFeatures).enter().append("rect").attr("class","legendRect")
+    legend.selectAll(".legendRect").data(boxplotFeatures).enter().append("rect")
+        .attr("class","legendRect").attr("id",d=>"legendRect"+d+location)
         .attr("x", (d,i)=>i*80)
         .attr("y", 0).attr("width", 5).attr("height",5)
         .attr("fill", d=>{
             return boxplotColor(d)});
 
-    legend.selectAll(".legendText").data(boxplotFeatures).enter().append("text").attr("class","legendText")
+    legend.selectAll(".legendText").data(boxplotFeatures).enter().append("text")
+        .attr("class","legendText").attr("id",d=>"legendText"+d+location)
         .attr("x", (d,i)=>i*80+10)
         .attr("y", 5).text(d=>d)
         .style("font-size","8px")
@@ -226,17 +228,21 @@ function drawLine(boxplot,property,location) {
 }
 
 function MouseOver(data) {
-    console.log(data[0].location);
+    // console.log(data[0].location);
     boxplotFeatures.forEach(d=>{
         if(d==data[0].feature){
             d3.select("#line"+d+data[0].location).attr("stroke-width",hover_line_stroke_width);
             d3.select("#innerArea"+d+data[0].location).attr("filter",null);
             d3.select("#outerArea"+d+data[0].location).attr("filter",null);
+            d3.select("#legendRect"+d+data[0].location).style("display",null);
+            d3.select("#legendText"+d+data[0].location).style("display",null);
         }
         else {
             d3.select("#line"+d+data[0].location).attr("display","none");
             d3.select("#innerArea"+d+data[0].location).attr("display","none");
             d3.select("#outerArea"+d+data[0].location).attr("display","none");
+            d3.select("#legendRect"+d+data[0].location).style("display","none");
+            d3.select("#legendText"+d+data[0].location).style("display","none");
         }
     })
 
@@ -254,6 +260,8 @@ function MouseOut(data){
             d3.select("#line"+d+data[0].location).attr("display",null);
             d3.select("#innerArea"+d+data[0].location).attr("display",null);
             d3.select("#outerArea"+d+data[0].location).attr("display",null);
+            d3.select("#legendRect"+d+data[0].location).style("display",null);
+            d3.select("#legendText"+d+data[0].location).style("display",null);
         }
     });
 
