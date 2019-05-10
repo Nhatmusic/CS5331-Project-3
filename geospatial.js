@@ -168,7 +168,7 @@ function drawGeoSlider(data) {
         .select('div#slider-simple')
         .append('svg')
         .attr('width', 400)
-        .attr('height', 40)
+        .attr('height', 65)
         .append('g')
         .attr('transform', 'translate(30,30)');
 
