@@ -3,10 +3,10 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row => {
-        row.time = parseTimeHeatGraph(row.time);
+        row.time = parseTimeGeo(row.time);
     });
     //get data of each location by time and sort
-     dataByTime = d3.nest().key(d => d.location).key(d => d.time).entries(rows);
+     dataByTime = d3.nest().key(d => d.location).key(d => RoundTimeHour(d.time)).entries(rows);
     dataByTime.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
     var timestep = [];
     var store_reportnum=[];
@@ -265,4 +265,15 @@ function showdatabylocation() {
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size","5px").classed("hover", false);
         });;
+}
+
+
+// Takes a date object and rounds it down to the nearest hour
+function RoundTimeHour(dateObject) {
+    let timeStampUTC = +dateObject; // Convert the date object to a UTC timestamp in milliseconds
+    timeStampUTC -= timeStampUTC %  // Subtract the remainder down to the nearest hour
+        (1000 *  // 1 second - 1000 milliseconds
+            60   *  // 1 minute - 60 seconds
+            60);    // 1 hour   - 60 minutes
+    return new Date(timeStampUTC);
 }
