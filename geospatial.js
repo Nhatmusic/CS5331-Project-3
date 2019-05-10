@@ -12,25 +12,25 @@ var hospitals = [
 var nuclearPlant = [-119.784825,0.162679];
 
 var neighborHood = [
-    {name: "PALACE HILLS",position: [-119.975400, 0.165560]},
-    {name: "NORTHWEST",position: [-119.930400, 0.183860]},
-    {name: "OLD TOWN",position: [-119.873400, 0.193060]},
-    {name: "SAFE TOWN",position: [-119.820400, 0.167060]},
-    {name: "SOUTH WEST",position: [-119.930400, 0.110060]},
-    {name: "DOWNTOWN",position: [-119.930400, 0.140060]},
-    {name: "WILSON FOREST",position: [-119.730400, 0.088060]},
-    {name: "SCENIC VISTA",position: [-119.780400, 0.032060]},
-    {name: "BROADVIEW’s",position: [-119.843400, 0.052060]},
-    {name: "CHAPPARAL’s",position: [-119.803400, 0.052060]},
-    {name: "TERRAPIN SPRINGS",position: [-119.770400, 0.073060]},
-    {name: "PEPPER MILL’s",position: [-119.765400, 0.103060]},
-    {name: "CHEDDARFORD’s",position: [-119.811400, 0.106060]},
-    {name: "EASTON",position: [-119.870800, 0.153120]},
-    {name: "WESTON",position: [-119.898520, 0.151090]},
-    {name: "SOUTHTON",position: [-119.900400, 0.119060]},
-    {name: "OAK WILLOW",position: [-119.853400, 0.083060]},
-    {name: "EAST PARTON",position: [-119.843400, 0.117060]},
-    {name: "WEST PARTON",position: [-119.876400, 0.106060]}];
+    {name: "1 - PALACE HILLS",position: [-119.975400, 0.165560]},
+    {name: "2 - NORTHWEST",position: [-119.930400, 0.183860]},
+    {name: "3 - OLD TOWN",position: [-119.873400, 0.193060]},
+    {name: "4 - SAFE TOWN",position: [-119.820400, 0.167060]},
+    {name: "5 - SOUTH WEST",position: [-119.930400, 0.110060]},
+    {name: "6 - DOWNTOWN",position: [-119.930400, 0.140060]},
+    {name: "7 - WILSON FOREST",position: [-119.730400, 0.088060]},
+    {name: "8 - SCENIC VISTA",position: [-119.780400, 0.032060]},
+    {name: "9 - BROADVIEW’s",position: [-119.843400, 0.052060]},
+    {name: "10 - CHAPPARAL’s",position: [-119.803400, 0.052060]},
+    {name: "11 - TERRAPIN SPRINGS",position: [-119.770400, 0.073060]},
+    {name: "12 - PEPPER MILL’s",position: [-119.765400, 0.103060]},
+    {name: "13 - CHEDDARFORD’s",position: [-119.811400, 0.106060]},
+    {name: "14 - EASTON",position: [-119.870800, 0.153120]},
+    {name: "15 - WESTON",position: [-119.898520, 0.151090]},
+    {name: "16 - SOUTHTON",position: [-119.900400, 0.119060]},
+    {name: "17 - OAK WILLOW",position: [-119.853400, 0.083060]},
+    {name: "18 - EAST PARTON",position: [-119.843400, 0.117060]},
+    {name: "19 - WEST PARTON",position: [-119.876400, 0.106060]}];
 
 var checkedNeighborhood = ["1","3","5","7"];
 
@@ -328,11 +328,11 @@ function drawMap(data) {
         .attr("x",d=>projection(d.position)[0])
         .attr("y",d=>projection(d.position)[1])
         .attr("transform", d=>{
-            if(d.name == "WILSON FOREST")
+            if(d.name == "7 - WILSON FOREST")
                 return "translate(230,990) rotate(-90)";
-            else if(d.name == "CHAPPARAL’s")
+            else if(d.name == "10 - CHAPPARAL’s")
                 return "translate(30,908) rotate(-90)";
-            else if(d.name == "SCENIC VISTA")
+            else if(d.name == "8 - SCENIC VISTA")
                 return "translate(-150,255) rotate(-25)";
             return null;
         })
