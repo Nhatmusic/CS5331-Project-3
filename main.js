@@ -7,9 +7,54 @@ var selectedCategories = [];
 var categories = [];
 var categoriesByTimeSpan = {};
 
+
 //Time Format and Parsing
 const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
-const formatTime = d3.timeFormat("%d");
+const formatTimeDay = d3.timeFormat("%d");
+
+// Takes a date object and rounds it down to the nearest day interval multiplied by the dayMultiplier
+function RoundTimeDay(dateObject, dayMultiplier = 1) {
+    let hourMultiplier =    24 *    // 1 day    - 24 hours
+                            dayMultiplier;
+    
+    RoundTimeHour(dateObject, hourMultiplier);
+}
+
+// Takes a date object and rounds it down to the nearest hour interval multiplied by the hourMultiplier
+function RoundTimeHour(dateObject, hourMultiplier = 1) {
+    let timeMultiplier =    60 *    // 1 hour   - 60 minutes
+                            hourMultiplier;
+    
+    RoundTimeMinutes(timeMultiplier);
+}
+
+// Takes a date object and rounds it down to the nearest minute interval multiplied by the minuteMultiplier
+// This function assumes that the relevant locale is the Central Time Zone of the Americas
+function RoundTimeMinutes(dateObject, minuteMultiplier = 1) {
+    const LOCALE_OFFSET = -5;
+    let timeStampUTC = +dateObject; // Convert the date object to a UTC timestamp in milliseconds
+    
+    // Account for the Central Time locale offset
+    // Subtract the 5-hour difference to ensure rounding by Central Time and not UTC
+    timeStampUTC += 1000    *       // 1 second - 1000 milliseconds
+                    60      *       // 1 minute - 60 seconds
+                    60      *       // 1 hour   - 60 minutes
+                    LOCALE_OFFSET;  // 5 hours
+    
+    // Subtract the remainder down to the nearest minute interval multiplied by the minuteMultiplier
+    timeStampUTC -= timeStampUTC % (minuteMultiplier *
+                                    1000    *  // 1 second - 1000 milliseconds
+                                    60);       // 1 minute - 60 seconds
+    
+    // Account for the Central Time locale offset
+    // Add the 5-hour difference to ensure that the proper Central Time value is displayed
+    timeStampUTC -= 1000    *       // 1 second - 1000 milliseconds
+                    60      *       // 1 minute - 60 seconds
+                    60      *       // 1 hour   - 60 minutes
+                    LOCALE_OFFSET;  // 5 hours
+    
+    return new Date(timeStampUTC);
+}
 
 d3.csv("./Dataset/data-optimized1.csv")
     .row(function (d) {
@@ -30,7 +75,7 @@ d3.csv("./Dataset/data-optimized1.csv")
 
         // Doing Time Slider
         dataset.forEach(d => {
-            var timeSpan = d.time = +formatTime(parseTime(d.time));
+            var timeSpan = d.time = +formatTimeDay(parseTimeGeo(d.time));
             features.forEach(feature => {
                 if (feature !== "location")
                     d[feature] = +d[feature];

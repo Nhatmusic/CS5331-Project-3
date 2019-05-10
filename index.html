@@ -14,8 +14,6 @@
     <script src="./js/math.min.js"></script>
     <script src="./js/underscore.js"></script>
     <script src="./js/d3-legend.min.js"></script>
-    <script src="https://d3js.org/d3-array.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
 </head>
 <style>
     .chart {
@@ -76,54 +74,62 @@
         cursor: grab;
     }
 
+    #box-plot{
+      position:absolute;
+      top: 950px;
+      left: 1000px;
+    }
+
 </style>
 <body>
-        <div class="header">
-             Mini Challenge 1 Visualization
-        </div>
-        <div class="filter">
-            <label>Select Data Filter</br></label>
-            <input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>
-            <input type="radio" name="chooseGraph" id="category"> By Location<br>
-
-            <input type="submit" value="Choose" onclick="chooseOption()">
-            <input type="submit" value="Reset" onclick="resetAll()">
-        </div>
-
-        <div id="slider">
-            <div class="col-sm-1"><div id="slider-time"></div></div>
-        </div>
-
-        <br>
-        <div class="categoryContainer">
-
-            <div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
-        </div>
-
+    <div class="header">
+         Mini Challenge 1 Visualization
     </div>
-        <div id="legend-chart"></div>
-<div class="row">
-    <div class="column">
-        <div id="chart-area" >
-            <h1>Parallel Coordinate Graph</h1>
+    <div class="filter">
+        <label>Select Data Filter</br></label>
+        <input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>
+        <input type="radio" name="chooseGraph" id="category"> By Location<br>
+
+        <input type="submit" value="Choose" onclick="chooseOption()">
+        <input type="submit" value="Reset" onclick="resetAll()">
+    </div>
+
+    <div id="slider">
+        <div class="col-sm-1">
+            <div id="slider-time"></div>
         </div>
     </div>
-</div>
+    <br>
+    <div class="categoryContainer">
+        <div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
+    </div>
+    <div id="legend-chart"></div>
+    
+    <div class="row">
+        <div class="column">
+            <div id="chart-area" >
+                <h1>Parallel Coordinate Graph</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="geospatial">
             <h2>Geospatial Graph</h2>
         </div>
-
-        <div id="heatmap">
+    </div>
+    <div id="heatmap">
             <button id="button1" onclick="showdatabyfeature()">By Damage Type</button>
             <button id="button2" onclick="showdatabylocation()">By Location</button>
             <h3>Heatmap by Location</h3>
         </div>
+    <div id="box-plot"></div>
 
-<div id="controller"></div>
-<script src="https://unpkg.com/d3-simple-slider"></script>
-        <script src="heatmap.js" ></script>
-        <script src="geospatial.js" ></script>
-<script src="parallel.js"></script>
-<script src="main.js"></script>
+    <div id="controller"></div>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="heatmap.js" ></script>
+    <script src="geospatial.js" ></script>
+    <script src="violin_and_boxplot.js"></script>
+    <script src="parallel.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

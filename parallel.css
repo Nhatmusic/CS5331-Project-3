@@ -1,5 +1,5 @@
 svg {
-    font: 10px Times;
+    font: 15px Times;
 }
 
 .background path {
@@ -217,6 +217,7 @@ h3 {
     -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
 }
+
 .heatmap_tooltip:after, .heatmap_tooltip:before {
     top: 100%;
     border: solid transparent;
@@ -226,6 +227,7 @@ h3 {
     position: absolute;
     pointer-events: none;
 }
+
 .heatmap_tooltip:after {
     border-color: rgba(236, 240, 241, 0);
     border-top-color: #FFFFF;
@@ -233,6 +235,7 @@ h3 {
     left: 50%;
     margin-left: -10px;
 }
+
 .heatmap_tooltip:before {
     border-color: rgba(44, 62, 80, 0);
     border-top-color: #66F;
@@ -247,7 +250,17 @@ text.hover {
     fill: #66F;
     font-background: #000;
 }
-.x_axis { font: 5px sans-serif; }
+
+.geoNuclear{
+    fill: #fcce1f;
+    stroke: black;
+    r: 12px;
+}
+
+.geoHospitals {
+    fill: red;
+    r: 5px;
+}
 
 #button1 {
     background-color: #4CAF50; /* Green */
@@ -277,6 +290,10 @@ text.hover {
     top: 70px;
     left: 100px;
     cursor: pointer;
+}
+
+.grid {
+    font-size: 8px;
 }
 
 #button1:hover {background-color: deepskyblue;
