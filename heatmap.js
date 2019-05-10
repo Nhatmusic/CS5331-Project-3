@@ -82,10 +82,11 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     array_label=Array.apply(null, {length: N}).map(Number.call, Number)
     //create time line axis
     // Create scale
-    var scale = d3.scaleLinear()
-        .domain([d3.min(array_label), d3.max(array_label)])
-        .range([0, 840]);
-
+    // var scale = d3.scaleLinear()
+    //     .domain([d3.min(array_label), d3.max(array_label)])
+    //     .range([0, 840]);
+    var scale = d3.scaleLinear().range([0, 840]).domain([0,5]);
+    var data_label = ['Mon 6',"Tue 7","Wed 8","Thu 9", "Fri 10", "Sat 11"]
     // create svg for group of LOCATION
      maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
@@ -93,9 +94,10 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("id", function (d, i) {
             return "location" + i
         })
+
     var time_axis=svg.append("g").attr("class","x_axis")
         .attr("transform", "translate(152," + 80 + ")")
-        .call(d3.axisBottom(scale).ticks(60));
+        .call(d3.axisBottom(scale).ticks(5).tickFormat(function(d) { return data_label[d]; }));
 
     svg.append("text")
         .attr("transform",
