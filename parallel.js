@@ -133,7 +133,7 @@ function graphByCategory() {
     });
     drawGraph(selectedSongs, 0, selectedCategories);
     // Draw_Scatterplot(selectedSongs);
-    console.log(selectedCategories);
+    // console.log(selectedCategories);
 }
 
 function addCheckBoxes(array) {

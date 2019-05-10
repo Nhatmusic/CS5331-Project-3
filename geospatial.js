@@ -51,7 +51,8 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
 
     // time range
-    var timeRange = d3.extent(rows,d=>{return d.time});console.log(timeRange);
+    var timeRange = d3.extent(rows,d=>{return d.time});
+    // console.log(timeRange);
 
     // nest data by location
     //update boxplot

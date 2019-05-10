@@ -143,7 +143,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     var heatmap = rows.selectAll(".cell")
         .data(function(row) {
             j = row.noreport;
-            console.log(j)
+            // console.log(j)
             return row.data.map(d => {
                 return {data: d, report: j}
             });
@@ -169,7 +169,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("stroke","black")
 
         .on('mouseover', function (cell) {
-            console.log(cell.report)
+            // console.log(cell.report)
                 tooltip.html('<div class="heatmap_tooltip">' + "Report_No: " + cell.report +  "<br/>" + "Mean_value: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
                 tooltip.style("visibility", "visible");
         })
