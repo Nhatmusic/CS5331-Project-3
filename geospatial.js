@@ -32,7 +32,7 @@ var neighborHood = [
     {name: "18 - EAST PARTON",position: [-119.843400, 0.117060]},
     {name: "19 - WEST PARTON",position: [-119.876400, 0.106060]}];
 
-var checkedNeighborhood = ["1","3","5","7"];
+var checkedNeighborhood = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19"];
 
 const GEO_OPACITY_DEFAULT = 0.3;
 const GEO_OPACITY_HOVER = 0.7;
@@ -90,8 +90,13 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     dataByTime.map(d=>{time.push(d.key)});
     drawGeoSlider(time);
 
+    const INITIAL_TIME_SPAN = 6;
     // Take in the data and process it for the Geospatial Diagram
-    analyzeDataByLocation(rows);
+    selectedGeoData = initialData.filter(function(d) {
+        return +formatTimeDay(RoundTimeDay(d.time)) === INITIAL_TIME_SPAN;
+    });
+    selectedGeoData.columns = initialData.columns;
+    analyzeDataByLocation(selectedGeoData);
 
     // Process the GeoJSON map file for rendering the Geospatial Diagram
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
