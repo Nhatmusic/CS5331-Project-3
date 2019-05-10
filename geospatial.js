@@ -295,13 +295,13 @@ function drawMap(data) {
                 checkedNeighborhood.push(id);
                 d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
                 d3.select("#svg"+id).transition().duration(1000).style("display",null);
-                graphByCategory([id],ADD_CODE);
+                // graphByCategory([id],ADD_CODE);
             }
             else {
                 checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
                 d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
                 d3.select("#svg"+id).transition().duration(1000).style("display","none");
-                graphByCategory([id],DELETE_CODE);
+                // graphByCategory([id],DELETE_CODE);
             }
 
         })
