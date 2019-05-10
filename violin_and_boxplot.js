@@ -36,11 +36,16 @@ var outerFilter = boxplotSvg.append("defs")
 
 let boxplotFeatures = [];
 let locations = [];
-d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
+d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
 
+    var tempFeatures = rows.columns;
     rows.forEach(row=>{
         row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
-        // console.log(row.time);
+        tempFeatures.forEach(d=>{
+            if(d !== "time")
+                if(row[d] <= 0)
+                    row[d] = null;
+        })
     });
 
 
@@ -117,7 +122,7 @@ function drawLine(boxplot,property,location) {
     // console.log(data);
 
 
-    var areaOuter = d3.area()
+    var areaOuter = d3.area().defined(d=>d[property].mean)
         .x(d=>boxplotX(new Date(d.time)))
         .y0(d=>boxplotY(d[property].upperInnerFence))
         .y1(d=>boxplotY(d[property].lowerInnerFence))
@@ -130,7 +135,7 @@ function drawLine(boxplot,property,location) {
         .attr("d", areaOuter)
         .attr("filter","url(#outerFilter)");
     //
-    var areaInner = d3.area()
+    var areaInner = d3.area().defined(d=>d[property].mean)
         .x(d=>{
             // console.log(d.lowerInnerFence + ", " + d.quartile1+", "+d.quartile3 +", "+d.median + ", " + d.upperInnerFence);
             return boxplotX(new Date(d.time))})
@@ -147,8 +152,9 @@ function drawLine(boxplot,property,location) {
 
 
     //
-    var boxplotLine = d3.line().x(d=>boxplotX(new Date(d.time)))
-        .y(d=>boxplotY(d[property].median))
+    var boxplotLine = d3.line().defined(d=>d[property].mean)
+        .x(d=>boxplotX(new Date(d.time)))
+        .y(d=>boxplotY(d[property].mean))
         .curve(d3.curveCatmullRom.alpha(0.5));
 
     var boxplotPath = boxplotG.append("path").datum(data)
@@ -175,7 +181,7 @@ function drawLine(boxplot,property,location) {
 }
 
 function MouseOver(data) {
-    // console.log(data);
+    console.log(data[0].feature);
     boxplotFeatures.forEach(d=>{
         if(d==data[0].feature){
             d3.select("#line"+d+data[0].location).attr("stroke-width",hover_strok_width);
@@ -267,7 +273,7 @@ function objByPropertyAndLocation(array, properties, location) {
         // console.log(d.time);
     });
     temp.sort((a,b)=>a-b);
-    if(temp.length <= 0)
-        return getMetrics([0]);
+    // if(temp.length <= 0)
+    //     return getMetrics([0]);
     return getMetrics(temp);
 }
