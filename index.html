@@ -76,52 +76,55 @@
         cursor: grab;
     }
 
+    #box-plot{
+      position:absolute;
+      top: 1000px;
+      left: 1000px
+    }
+
 </style>
 <body>
-        <div class="header">
-             Mini Challenge 1 Visualization
-        </div>
-        <div class="filter">
-            <label>Select Data Filter</br></label>
-            <input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>
-            <input type="radio" name="chooseGraph" id="category"> By Location<br>
-
-            <input type="submit" value="Choose" onclick="chooseOption()">
-            <input type="submit" value="Reset" onclick="resetAll()">
-        </div>
-
-        <div id="slider">
-            <div class="col-sm-1"><div id="slider-time"></div></div>
-        </div>
-        <div class="row align-items-center">
-            <div class="col-sm-2"><p id="value-simple"></p></div>
-            <div class="col-sm"><div id="slider-simple"></div></div>
-        </div>
-        <br>
-        <div class="categoryContainer">
-
-            <div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
-        </div>
-
+    <div class="header">
+         Mini Challenge 1 Visualization
     </div>
-        <div id="legend-chart"></div>
-<div class="row">
-    <div class="column">
-        <div id="chart-area" >
-            <h1>Parallel Coordinate Graph</h1>
-        </div>
+    <div class="filter">
+        <label>Select Data Filter</br></label>
+        <input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>
+        <input type="radio" name="chooseGraph" id="category"> By Location<br>
+
+        <input type="submit" value="Choose" onclick="chooseOption()">
+        <input type="submit" value="Reset" onclick="resetAll()">
     </div>
-</div>
-        <div class="row">
-            <div class="geospatial">
-                <h2>Geospatial Graph</h2>
+
+    <div id="slider">
+        <div class="col-sm-1"><div id="slider-time"></div></div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-sm-2"><p id="value-simple"></p></div>
+        <div class="col-sm"><div id="slider-simple"></div></div>
+    </div>
+    <br>
+    <div class="categoryContainer">
+        <div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
+    </div>
+    <div id="legend-chart"></div>
+    
+    <div class="row">
+        <div class="column">
+            <div id="chart-area" >
+                <h1>Parallel Coordinate Graph</h1>
             </div>
-
         </div>
-        <div id="heatmap">
-          <h3>Heatmap by Location</h3>
+    </div>
+    <div class="row">
+        <div class="geospatial">
+            <h2>Geospatial Graph</h2>
         </div>
-        <div id="box-plot"></div>
+    </div>
+    <div id="heatmap">
+      <h3>Heatmap by Location</h3>
+    </div>
+    <div id="box-plot"></div>
 
 <div id="controller"></div>
 <script src="https://unpkg.com/d3-simple-slider"></script>
