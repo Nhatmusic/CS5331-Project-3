@@ -247,3 +247,31 @@ text.hover {
     font-background: #000;
 }
 .x_axis { font: 5px sans-serif; }
+
+#button1 {
+    background-color: #4CAF50; /* Green */
+    border: 2px solid gray;
+    color: white;
+    padding: 5px 52px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    font-size: 10px;
+    position: absolute;
+    top: 40px;
+    cursor: pointer;
+}
+
+#button2 {
+    background-color: #4CAF50; /* Green */
+    border: 2px solid gray;
+    color: white;
+    padding: 5px 52px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    font-size: 10px;
+    position: absolute;
+    top: 70px;
+    cursor: pointer;
+}

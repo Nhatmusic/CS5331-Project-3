@@ -9,7 +9,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     dataByTime.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
     var timestep = [];
     var store_reportnum=[];
-    dataByTime[1].values.forEach(d => timestep.push(d.key))
+    dataByTime[1].values.forEach((d,i) => timestep.push(d.key))
     dataByTime.forEach(d => d.values.forEach(d => d.time_step = timestep.indexOf(d.key)));
     var array_data3 = [];
     dataByTime.forEach(d => {
@@ -20,7 +20,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
                 array_data1.push([+d2.shake_intensity, +d2.medical, +d2.buildings,+d2.power, +d2.roads_and_bridges, +d2.sewer_and_water])
             })
-            array_data2.push({"value": array_data1, "step": d1.time_step, "noreport":d1.values.length})
+            array_data2.push({"value": array_data1, "step": d1.time_step, "noreport":d1.values.length, "location":d.key })
             store_reportnum.push(d1.values.length)
 
         })
@@ -42,7 +42,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             array_data_mean.forEach(d2 =>
                 array_data_mean2.push(math.mean(d2))
             )
-            array_data_mean3.push({"data": array_data_mean2, "step": d1.step ,"noreport": d1.noreport})
+            array_data_mean3.push({"data": array_data_mean2, "step": d1.step ,"noreport": d1.noreport, "location":parseInt(d1.location)})
         })
         array_data_mean4.push(array_data_mean3)
 
@@ -73,7 +73,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     var colorScale = d3.scaleQuantize()
         .domain([0, 10])
         .range(colors);
-    var rowLabelData =  ["shake_intensity","medical","buidings","power","roads_bridges","sewer_water"]
+    rowLabelData =  ["shake_intensity","medical","buidings","power","roads_bridges","sewer_water"]
 
 
     // Add scales to axis
@@ -87,7 +87,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .range([0, 840]);
 
     // create svg for group of LOCATION
-    var maing = svg.selectAll('g').data(array_data_mean4).enter()
+     maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
         .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * viewerHeight / 80})`)
         .attr("id", function (d, i) {
@@ -131,7 +131,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             d3.select(this).style("font-size","5px").classed("hover", false);
         });;
 
-    var rows = maing.selectAll(".row")
+    rowss = maing.selectAll(".row")
         .data(rows=>rows)
             .enter().append("g")
         .attr("class", "row")
@@ -139,13 +139,14 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("class", function (d,i){
             return "column"+d.step;
         });
-    var j;
-    var heatmap = rows.selectAll(".cell")
+    var j,l;
+     var heatmap = rowss.selectAll(".cell")
         .data(function(row) {
             j = row.noreport;
+            l = row.location;
             console.log(j)
-            return row.data.map(d => {
-                return {data: d, report: j}
+            return row.data.map((d,i) => {
+                return {data: d, report: j, location: l, type:i}
             });
         })
         .enter().append("rect")
@@ -156,7 +157,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("rx", 2)
         .attr("ry", 2)
         .attr("class", function (cell, i) {
-            return "cell bordered cr" + i;
+            return "cell " + i + " loc " +cell.location;
         })
         .attr("width", cellSize / 2)
         .attr("height", cellSize / 2)
@@ -170,7 +171,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
 
         .on('mouseover', function (cell) {
             console.log(cell.report)
-                tooltip.html('<div class="heatmap_tooltip">' + "Report_No: " + cell.report +  "<br/>" + "Mean_value: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
+                tooltip.html('<div class="heatmap_tooltip">' + "Report Quantity: " + cell.report +  "<br/>" + "Mean_value: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
                 tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
@@ -181,4 +182,86 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             tooltip.style("top", (d3.event.pageY - 880) + "px").style("left", (d3.event.pageX - 60) + "px");
         });
 
+    var legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform",
+            "translate(100,-80)")
+        .selectAll(".legendElement")
+        .data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        .enter().append("g")
+        .attr("class", "legendElement");
+
+    legend.append("svg:rect")
+        .attr("x", function (d, i) {
+            return legendElementWidth * i;
+        })
+        .attr("y", 115)
+        .attr("class", "cellLegend bordered")
+        .attr("width", legendElementWidth)
+        .attr("height", cellSize / 2)
+        .style("fill", function (d, i) {
+            return colors[i];
+
+        });
+
+    legend.append("text")
+        .attr("class", "mono legendElement")
+        .attr("font-size","10px")
+        .text(function (d) {
+            return "≥" + Math.round(d * 100) / 100;
+        })
+        .attr("x", function (d, i) {
+            return legendElementWidth * i;
+        })
+        .attr("y", 130);
+
+
 });
+
+function showdatabyfeature() {
+var a=[0,1,2,3,4,5]
+svg.transition().duration(3000).selectAll(".cell")
+    .attr("y",
+        function (d) {
+            if(a.includes(d.type)) {
+
+                return d.type*160-(d.location - 1) * 43;
+            }
+        });
+maing.selectAll("text").remove()
+}
+
+function showdatabylocation() {
+    var cellSize=10;
+    rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
+        .attr("y", function (cell,i) {
+            return i * (cellSize+4) / 2;
+        })
+    var rowLabels = maing.append("g")
+        .attr("class", "rowLabels")
+        .selectAll(".rowLabel")
+        .data(rowLabelData)
+        .enter().append("text")
+        .text(function (rowLabel) {
+            return rowLabel
+        })
+        .attr("x", 0)
+        .attr("y", function (rowLabel, i) {
+            return (i*cellSize/1.4 );
+        })
+        .style("text-anchor", "middle")
+        .style("font-size", "5px")
+        .attr("transform", function (rowLabel) {
+            return `translate(-20, ${4})`;
+        })
+        .attr("class", "rowLabel mono")
+        .attr("id", function (rowLabel, i) {
+            return "rowLabel_" + i;
+        })
+        .on('mouseover', function (d, i) {
+            d3.select(this).style("font-size","10px").classed("hover", true);
+        })
+        .on('mouseout', function (d, i) {
+            d3.select(this).style("font-size","5px").classed("hover", false);
+        });;
+}
