@@ -4,9 +4,9 @@ var boxplotWidth = 1300, boxplotHeight = 400,
     boxplotContentWidth = boxplotWidth - boxplotMargin.left - boxplotMargin.right,
     boxplotContentHeight = boxplotHeight - boxplotMargin.top - boxplotMargin.bottom;
 
-var boxplotSvg = d3.select("#box-plot").append("svg").attr("width", boxplotWidth).attr("height", boxplotHeight),
-    boxplotG = boxplotSvg.append("g").attr("transform", "translate(" + boxplotMargin.left + "," + boxplotMargin.top + ")");
-    // titleGroup = boxplotSvg.append("g").attr("transform", "translate(" + (boxplotContentHeight - 15) + "," + (boxplotMargin.top - 15) + ")");
+// var boxplotSvg = d3.select("#box-plot").append("svg").attr("id","svg1").attr("width", boxplotWidth).attr("height", boxplotHeight),
+//     boxplotG = boxplotSvg.append("g").attr("id","g1").attr("transform", "translate(" + boxplotMargin.left + "," + boxplotMargin.top + ")");
+
 
 // x, y, and color Scale
 var boxplotX = d3.scaleTime().range([0, boxplotContentWidth]),
@@ -17,26 +17,9 @@ var boxplotX = d3.scaleTime().range([0, boxplotContentWidth]),
 var boxplotXAxis = d3.axisBottom(boxplotX),
     boxplotYAxis = d3.axisLeft(boxplotY).ticks(5);
 
-// Define blur
-var innerFilter = boxplotSvg.append("defs")
-    .append("filter")
-    .attr("id", "innerFilter")
-    .append("feGaussianBlur")
-    .attr("stdDeviation", 1);
-
-var outerFilter = boxplotSvg.append("defs")
-    .append("filter")
-    .attr("id", "outerFilter")
-    .append("feGaussianBlur")
-    .attr("stdDeviation", 4);
-
-//drag object
-// var dragging = {};
-
-
 let boxplotFeatures = [];
 let locations = [];
-d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
+d3.csv("Dataset/data-optimized.csv",function (err, rows) {
 
     var tempFeatures = rows.columns;
     rows.forEach(row=>{
@@ -48,8 +31,7 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         })
     });
 
-
-    boxplotFeatures = rows.columns.slice(1,7);
+    boxplotFeatures = rows.columns.slice(2,8);
 
     //nest data by time and sort data
     var dataByTime = d3.nest().key(d=>d.time).entries(rows);
@@ -90,31 +72,65 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     var timeRange = d3.extent(rows,d=>d.time);
     // boxplotX.domain([new Date(timeRange[0]-5*60*60*1000),new Date(timeRange[1].getTime() + 5*60*60*1000)]);
     boxplotX.domain(timeRange);
-    let xAxisGroup = boxplotG.append("g")
-        .attr("class", "grid")
-        .attr("transform", "translate(0, " + boxplotContentHeight + ")").call(boxplotXAxis);
-    let yAxisGroup = boxplotG.append("g")
-        .attr("class", "grid").call(boxplotYAxis);
 
-    // draw axis
-    drawLine(boxplot,"power","1");
-    drawLine(boxplot,"sewer_and_water","1");
-    drawLine(boxplot,"roads_and_bridges","1");
-    drawLine(boxplot,"medical","1");
-    drawLine(boxplot,"buildings","1");
-    drawLine(boxplot,"shake_intensity","1");
+    // Draw all location
+    locations.forEach(loc=>{
+        generateLocationSvg(boxplot,loc);
+    });
+
 
 });
+
+// Generate svg, g, and lines
+function generateLocationSvg(boxplot,location) {
+    var svg = d3.select("#box-plot").append("svg").attr("id","svg"+location).attr("width", boxplotWidth).attr("height", boxplotHeight),
+        g = svg.append("g").attr("id","g"+location).attr("transform", "translate(" + boxplotMargin.left + "," + boxplotMargin.top + ")");
+
+    // Draw axises
+    g.append("g")
+        .attr("class", "grid")
+        .attr("transform", "translate(0, " + boxplotContentHeight + ")").call(boxplotXAxis);
+    g.append("g")
+        .attr("class", "grid").call(boxplotYAxis);
+
+    // Define blur
+    var innerFilter = svg.append("defs")
+        .append("filter")
+        .attr("id", "innerFilter"+location)
+        .append("feGaussianBlur")
+        .attr("stdDeviation", 1);
+
+    var outerFilter = svg.append("defs")
+        .append("filter")
+        .attr("id", "outerFilter"+location)
+        .append("feGaussianBlur")
+        .attr("stdDeviation", 4);
+
+    // Draw lines
+    boxplotFeatures.forEach(feature=>{
+        console.log(feature);
+        drawLine(boxplot,feature,location);
+    });
+
+    // Append title of graph
+    g.append("text").attr("x",50).attr("y",10)
+        .text("Location "+location)
+        .style("font-size","25px");
+
+}
 
 var outer_opacity = 0.3;
 const normal_stroke_width = 2;
 const hover_strok_width = 4 ;
 
+// Draw line graph
 function drawLine(boxplot,property,location) {
     var thisColor = boxplotColor(property);
+    var boxplotG = d3.select("#g"+location);
+
     var data = [];
     boxplot.forEach(d=>{
-        if(d.location === location && (property in d)){
+        if(d.location == location && (property in d)){
             // data.push({time: new Date(d.time), value: d[property].max});
             data.push(d);
         }
@@ -128,12 +144,12 @@ function drawLine(boxplot,property,location) {
         .y1(d=>boxplotY(d[property].lowerInnerFence))
         .curve(d3.curveCatmullRom.alpha(0.5));
 
-    var drawOuter = boxplotG.append("path").datum(data)
+    boxplotG.append("path").datum(data)
         .attr("class","boxplot"+location)
-        .attr("id",d=>"outerArea"+property+location)
+        .attr("id","outerArea"+property+location)
         .attr("fill",thisColor).style("opacity",outer_opacity)
         .attr("d", areaOuter)
-        .attr("filter","url(#outerFilter)");
+        .attr("filter","url(#outerFilter"+location+")");
     //
     var areaInner = d3.area().defined(d=>d[property].mean)
         .x(d=>{
@@ -143,12 +159,12 @@ function drawLine(boxplot,property,location) {
         .y1(d=>boxplotY(d[property].quartile3))
         .curve(d3.curveCatmullRom.alpha(0.5));
 
-    var drawInner = boxplotG.append("path").datum(data)
+    boxplotG.append("path").datum(data)
         .attr("class","boxplot"+location)
-        .attr("id",d=>"innerArea"+property+location)
+        .attr("id","innerArea"+property+location)
         .attr("fill",thisColor).style("opacity",outer_opacity)
         .attr("d", areaInner)
-        .attr("filter","url(#innerFilter)");
+        .attr("filter","url(#innerFilter"+location+")");
 
 
     //
@@ -157,9 +173,9 @@ function drawLine(boxplot,property,location) {
         .y(d=>boxplotY(d[property].mean))
         .curve(d3.curveCatmullRom.alpha(0.5));
 
-    var boxplotPath = boxplotG.append("path").datum(data)
+    boxplotG.append("path").datum(data)
         .attr("class","boxplot"+location)
-        .attr("id",d=>"line"+property+location)
+        .attr("id","line"+property+location)
         .attr("stroke",thisColor)
         .attr("stroke-width",normal_stroke_width)
         .attr("fill","none")
@@ -181,7 +197,7 @@ function drawLine(boxplot,property,location) {
 }
 
 function MouseOver(data) {
-    console.log(data[0].feature);
+    console.log(data[0].location);
     boxplotFeatures.forEach(d=>{
         if(d==data[0].feature){
             d3.select("#line"+d+data[0].location).attr("stroke-width",hover_strok_width);
@@ -198,11 +214,13 @@ function MouseOver(data) {
 }
 
 function MouseOut(data){
+
+    var location = data[0].location;
     boxplotFeatures.forEach(d=> {
         if (d == data[0].feature) {
             d3.select("#line" + data[0].feature + data[0].location).attr("stroke-width", normal_stroke_width);
-            d3.select("#innerArea" + data[0].feature + data[0].location).attr("filter", "url(#innerFilter)");
-          d3.select("#outerArea" + data[0].feature + data[0].location).attr("filter", "url(#outerFilter)");
+            d3.select("#innerArea" + data[0].feature + data[0].location).attr("filter", "url(#innerFilter"+location+")");
+          d3.select("#outerArea" + data[0].feature + data[0].location).attr("filter", "url(#outerFilter"+location+")");
         } else {
             d3.select("#line"+d+data[0].location).attr("display",null);
             d3.select("#innerArea"+d+data[0].location).attr("display",null);

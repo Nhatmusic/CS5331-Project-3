@@ -144,7 +144,7 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         .data(function(row) {
             j = row.noreport;
             l = row.location;
-            //console.log(j)
+            // console.log(j)
             return row.data.map((d,i) => {
                 return {data: d, report: j, location: l, type:i}
             });
