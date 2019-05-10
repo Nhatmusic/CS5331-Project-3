@@ -1,5 +1,6 @@
 # CS5331-Project-3
 
+Video Link: https://www.youtube.com/watch?v=nwuTuJTfbN4&feature=youtu.be
 App's Link: https://nhatmusic.github.io/CS5331-Project-3/
 
 ## Questions
@@ -45,9 +46,9 @@ Reports of "medical" damage (or lack thereof) coincides with the presence of hos
 
 ![Hospitals and Medical Damage](images/observations/medical-damage-and-hospitals.png)
 
----
+
 ## Answer questions
-### Question 1:
+### Question 1: 
 Comparing with major-quake shake map, it shows that:
 - Location: 3,4,7,12 are impacted significantly
 - Location: 2,13,16,17,18,19,11 are impacted minor
@@ -62,7 +63,7 @@ Observer the hardest hit part: Location 3
 ![Alt text](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/heat1.JPG)
 Priotize the reponse based on the level of damage over-time.
 
-### Question 2:
+### Question 2: 
 In this question, we use mean and quartiles to focus on uncertainty of each damgage feature on each location. With the line graph, we make some blur for the range of quartiles, which means further from mean, the more blur in the line graph.</br> 
 ![Location 11 - Terrapin Springs](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/observations/location%2011%20-%20line%20graph.png)
 ![Location 4 - Safe Town](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/observations/location%204%20-%20line%20graph.png)
@@ -71,4 +72,3 @@ Besides, we compare to locations that has uncertain reports for whole time.
 ![Location 15 - Weston](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/observations/location%2015%20-%20line%20graph.png)
 and ![Location 9 - Broadviews](https://github.com/Nhatmusic/CS5331-Project-3/blob/master/images/observations/location%209%20-%20line%20graph.png)
 Some reasons lead to this uncertainty are people has different damage level analyzes which is personals' view. On the map, I saw location 15 - Weston is close to 3 hospitals and close to the area suffered hardest hit from earthquake, so it will have more reports from people evacuated from many places.  
----
