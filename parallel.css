@@ -266,7 +266,7 @@ text.hover {
     background-color: #4CAF50; /* Green */
     border: 2px solid gray;
     color: white;
-    padding: 5px 52px;
+    padding: 5px 64px;
     text-align: center;
     text-decoration: none;
     /*display: inline-block;*/
@@ -274,4 +274,10 @@ text.hover {
     position: absolute;
     top: 70px;
     cursor: pointer;
+}
+
+#button1:hover {background-color: deepskyblue;
+}
+
+#button2:hover {background-color: deepskyblue;
 }
