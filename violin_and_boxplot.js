@@ -1,5 +1,5 @@
 // Info to show visualization
-var boxplotWidth = 900, boxplotHeight = 300,
+var boxplotWidth = 600, boxplotHeight = 100,
     boxplotMargin = {top: 30, right: 20, bottom: 30, left: 50},
     boxplotContentWidth = boxplotWidth - boxplotMargin.left - boxplotMargin.right,
     boxplotContentHeight = boxplotHeight - boxplotMargin.top - boxplotMargin.bottom;
@@ -68,8 +68,6 @@ d3.csv("Dataset/data-optimized.csv",function (err, rows) {
     });
     // console.log(boxplot);
 
-    // draw Axis
-
     var timeRange = d3.extent(rows,d=>d.time);
     // boxplotX.domain([new Date(timeRange[0]-5*60*60*1000),new Date(timeRange[1].getTime() + 5*60*60*1000)]);
     boxplotX.domain(timeRange);
@@ -126,15 +124,15 @@ function generateLocationSvg(boxplot,location) {
     // Append title of graph
     g.append("text").attr("x",50).attr("y",10)
         .text("Location "+location+ " - " + neighborHood[+location-1].name)
-        .style("font-size","25px");
+        .style("font-size","8px");
 
     svg.style("display","none");
 
 }
 
 var outer_opacity = 0.3;
-const normal_line_stroke_width = 2;
-const hover_line_stroke_width = 4 ;
+const normal_line_stroke_width = 1;
+const hover_line_stroke_width = 2 ;
 
 // Draw line graph
 function drawLine(boxplot,property,location) {

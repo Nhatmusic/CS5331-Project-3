@@ -288,3 +288,7 @@ text.hover {
     top: 70px;
     cursor: pointer;
 }
+
+.grid {
+    font-size: 8px;
+}
