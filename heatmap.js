@@ -232,12 +232,11 @@ svg.transition().duration(3000).selectAll(".cell")
                 return d.type*160-(d.location - 1) * 43;
             }
         });
-    var locationlabel=[]
     var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
     var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
     // Add the y Axis
     svg.append("g").attr("class","label_axis")
-        .attr("transform", "translate(80," + 100 + ")")
+        .attr("transform", "translate(120," + 100 + ")")
         .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return label[d]; }));
 maing.selectAll("text").remove();
 svg.select(".y_axis").remove();
@@ -246,11 +245,12 @@ svg.select(".y_axis").remove();
 function showdatabylocation() {
     svg.select(".label_axis").remove();
     maing.selectAll("text").remove()
-    var y = d3.scaleLinear().range([945, 0]).domain([19.5,0.5]);
+    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
     // Add the y Axis
     svg.append("g").attr("class","y_axis")
-        .attr("transform", "translate(50," + 100 + ")")
-        .call(d3.axisLeft(y).ticks(19));
+        .attr("transform", "translate(100," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
     var cellSize=10;
     rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
         .attr("y", function (cell,i) {
