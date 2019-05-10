@@ -23,6 +23,7 @@ svg {
     top: 800px;
     width:1000px;
     height:1400px;
+
 }
 .foreground path {
     fill: none;
@@ -272,6 +273,7 @@ text.hover {
     font-size: 10px;
     position: absolute;
     top: 40px;
+    left: 100px;
     cursor: pointer;
 }
 
@@ -279,16 +281,23 @@ text.hover {
     background-color: #4CAF50; /* Green */
     border: 2px solid gray;
     color: white;
-    padding: 5px 52px;
+    padding: 5px 64px;
     text-align: center;
     text-decoration: none;
     /*display: inline-block;*/
     font-size: 10px;
     position: absolute;
     top: 70px;
+    left: 100px;
     cursor: pointer;
 }
 
 .grid {
     font-size: 8px;
+}
+
+#button1:hover {background-color: deepskyblue;
+}
+
+#button2:hover {background-color: deepskyblue;
 }

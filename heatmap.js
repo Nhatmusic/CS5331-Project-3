@@ -58,9 +58,9 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     var classesNumber = 9,
         cellSize = 10,
         viewerWidth = 1000,
-        viewerHeight = 4000,
+        viewerHeight = 2000,
         viewerPosTop = 100,
-        viewerPosLeft = 100,
+        viewerPosLeft = 150,
         viewerPosBot = 300,
         rowLabelMargin = 10,
         legendElementWidth = cellSize * 2;
@@ -89,12 +89,12 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     // create svg for group of LOCATION
      maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
-        .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * viewerHeight / 80})`)
+        .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * 50})`)
         .attr("id", function (d, i) {
             return "location" + i
         })
     var time_axis=svg.append("g").attr("class","x_axis")
-        .attr("transform", "translate(102," + 80 + ")")
+        .attr("transform", "translate(152," + 80 + ")")
         .call(d3.axisBottom(scale).ticks(60));
 
     svg.append("text")
@@ -144,7 +144,6 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         .data(function(row) {
             j = row.noreport;
             l = row.location;
-            // console.log(j)
             return row.data.map((d,i) => {
                 return {data: d, report: j, location: l, type:i}
             });
@@ -154,8 +153,8 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         .attr("y", function (cell,i) {
             return i * (cellSize+4) / 2;
         })
-        .attr("rx", 2)
-        .attr("ry", 2)
+        // .attr("rx", 2)
+        // .attr("ry", 2)
         .attr("class", function (cell, i) {
             return "cell " + i + " loc " +cell.location;
         })
@@ -170,8 +169,7 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         .attr("stroke","black")
 
         .on('mouseover', function (cell) {
-            //console.log(cell.report)
-                tooltip.html('<div class="heatmap_tooltip">' + "Report Quantity: " + cell.report +  "<br/>" + "Mean_value: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
+                tooltip.html('<div class="heatmap_tooltip">' + "Location: " + cell.location +  "<br/>"+ "Report Quantity: " + cell.report +  "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
                 tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
@@ -179,7 +177,7 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 880) + "px").style("left", (d3.event.pageX - 60) + "px");
+            tooltip.style("top", (d3.event.pageY - 910) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
 
     var legend = svg.append("g")
@@ -215,6 +213,12 @@ d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
         })
         .attr("y", 130);
 
+    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
+    // Add the y Axis
+    svg.append("g").attr("class","y_axis")
+        .attr("transform", "translate(100," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
 
 });
 
@@ -228,10 +232,25 @@ svg.transition().duration(3000).selectAll(".cell")
                 return d.type*160-(d.location - 1) * 43;
             }
         });
-maing.selectAll("text").remove()
+    var locationlabel=[]
+    var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
+    var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
+    // Add the y Axis
+    svg.append("g").attr("class","label_axis")
+        .attr("transform", "translate(80," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return label[d]; }));
+maing.selectAll("text").remove();
+svg.select(".y_axis").remove();
 }
 
 function showdatabylocation() {
+    svg.select(".label_axis").remove();
+    maing.selectAll("text").remove()
+    var y = d3.scaleLinear().range([945, 0]).domain([19.5,0.5]);
+    // Add the y Axis
+    svg.append("g").attr("class","y_axis")
+        .attr("transform", "translate(50," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19));
     var cellSize=10;
     rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
         .attr("y", function (cell,i) {
@@ -263,7 +282,7 @@ function showdatabylocation() {
         })
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size","5px").classed("hover", false);
-        });;
+        });
 }
 
 

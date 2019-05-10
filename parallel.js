@@ -6,9 +6,9 @@ var parallelWidth = 850, parallelHeight = 400,
     parallelContentWidth = parallelWidth - parallelMargin.left - parallelMargin.right,
     parallelContentHeight = parallelHeight - parallelMargin.top - parallelMargin.bottom;
 
-var parallelSvg = d3.select("#chart-area").append("svg").attr("width", parallelWidth + 200).attr("height", parallelHeight),
-    g = parallelSvg.append("g").attr("transform", "translate(" + parallelMargin.left + "," + parallelMargin.top + ")"),
-    titleGroup = parallelSvg.append("g").attr("transform", "translate(" + (parallelContentHeight - 15) + "," + (parallelMargin.top - 15) + ")");
+var parallelSvg = d3.select("#chart-area").append("svg").attr("width", parallelWidth + 200).attr("height", parallelHeight+100),
+    g = parallelSvg.append("g").attr("transform", "translate(" + parallelMargin.left + "," + 100 + ")"),
+    titleGroup = parallelSvg.append("g").attr("transform", "translate(" + (parallelContentHeight - 15) + "," + (parallelMargin.top + 50) + ")");
 
 // x, y, and color Scale
 var xScale = d3.scalePoint().range([0, parallelContentWidth]),
@@ -300,7 +300,7 @@ function MouseOverLines(d) {
         .style("font", "12px sans-serif")
         .attr("y", -5)
         .attr("class", "title")
-        .text(d.location + " (" + d.time + ")");
+        .text("Location: " + d.location + "---" + "Time: " + " (" + d.time + ")");
 
     // Show rect before title
     titleGroup.append("rect")
