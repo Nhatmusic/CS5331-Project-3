@@ -1,8 +1,9 @@
-d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
+var parseTimeHeatGraph = d3.timeParse("%m/%d/%Y %H:%M");
+d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row => {
-        row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
+        row.time = parseTimeHeatGraph(row.time);
     });
     //get data of each location by time and sort
      dataByTime = d3.nest().key(d => d.location).key(d => d.time).entries(rows);
