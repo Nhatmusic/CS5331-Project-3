@@ -17,7 +17,7 @@ function RoundTimeDay(dateObject, dayMultiplier = 1) {
     let hourMultiplier =    24 *    // 1 day    - 24 hours
                             dayMultiplier;
     
-    RoundTimeHour(dateObject, hourMultiplier);
+    return RoundTimeHour(dateObject, hourMultiplier);
 }
 
 // Takes a date object and rounds it down to the nearest hour interval multiplied by the hourMultiplier
@@ -25,7 +25,7 @@ function RoundTimeHour(dateObject, hourMultiplier = 1) {
     let timeMultiplier =    60 *    // 1 hour   - 60 minutes
                             hourMultiplier;
     
-    RoundTimeMinutes(timeMultiplier);
+    return RoundTimeMinutes(dateObject, timeMultiplier);
 }
 
 // Takes a date object and rounds it down to the nearest minute interval multiplied by the minuteMultiplier
