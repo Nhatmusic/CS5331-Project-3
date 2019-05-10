@@ -35,7 +35,8 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 
 var initialData;
 
-d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
+// Get the data from the CSV and format it to our needs
+d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row=>{
@@ -99,8 +100,7 @@ function analyzeDataByLocation(data) {
                     featureDamage[feature] += +d[feature];
             })
         });
-
-
+        
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
         averageLocationDamage.push({location: location.key,

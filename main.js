@@ -30,7 +30,7 @@ d3.csv("./Dataset/data-optimized.csv")
 
         // Doing Time Slider
         dataset.forEach(d => {
-            var timeSpan = d.time = +formatTime(parseTime(d.time));
+            var timeSpan = d.time = +formatTime(parseTimeGeo(d.time));
             features.forEach(feature => {
                 if (feature !== "location")
                     d[feature] = +d[feature];

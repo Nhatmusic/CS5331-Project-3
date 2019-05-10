@@ -78,7 +78,7 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
   
   // Format the data to the proper datatypes
   data.forEach(function(d) {
-    d.time = parseTimeLineGraph(d.time);
+    d.time = parseTimeGeo(d.time);
     d.medical = +d.medical;
     d.location = +d.location;
   });
