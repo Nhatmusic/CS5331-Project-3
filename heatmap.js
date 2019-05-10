@@ -169,7 +169,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         .attr("stroke","black")
 
         .on('mouseover', function (cell) {
-                tooltip.html('<div class="heatmap_tooltip">' + "Report Quantity: " + cell.report +  "<br/>" + "Mean_value: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
+                tooltip.html('<div class="heatmap_tooltip">' + "Report Quantity: " + cell.report +  "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
                 tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
