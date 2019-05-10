@@ -20,7 +20,7 @@ var group = svgGeo.append("g").attr("transform","translate(30,10)");
 // var textLabel = g.append("text").attr("class","textLabel").attr("x",0).attr("y",0);
 
 // color feature
-var color = d3.scaleOrdinal().range(d3.schemeCategory20);
+// var color = d3.scaleOrdinal().range(d3.schemeCategory20);
 var GeoColor = d3.scaleLinear().range(['#1a9850','#d73027']).interpolate(d3.interpolateHcl);
 
 var projection = d3.geoMercator().center([-119.78,0.15]).scale(120000);
@@ -35,15 +35,19 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 
 var initialData;
 
-// Get the data from the CSV and format it to our needs
-d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
+var averageLocationDamageObj = {};
+var averageLocationDamage = [];
+var locationList = [];
+var featuresGeo = [];
+d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
 
     rows.forEach(row=>{
+        // console.log(row.time);
         row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
         // console.log(row.time);
     });
-    
+
     // Save the initial data for later use
     initialData = rows;
     initialData.columns = rows.columns;
@@ -62,7 +66,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     drawGeoSlider(time);
 
     analyzeDataByLocation(rows);
-    
+
     d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
 
         // console.log(geojson);
@@ -79,11 +83,11 @@ var featuresGeo = [];
 function analyzeDataByLocation(data) {
     // Get columns of data
     featuresGeo = data.columns.slice(1,8);
-    
+
     // nest data by location
     //update boxplot
     var dataByLocation = d3.nest().key(d=>d.location).entries(data);
-    
+
     // Calculate total/average damage for each location
     dataByLocation.forEach(location=>{
         var totalDamage = 0;
@@ -95,8 +99,8 @@ function analyzeDataByLocation(data) {
                     featureDamage[i] += +d[feature];
             })
         });
-        
-        
+
+
         averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
         locationList.push(location.key);
         averageLocationDamage.push({location: location.key,
@@ -111,7 +115,7 @@ function analyzeDataByLocation(data) {
             shake_intensity:(featureDamage[5]/location.values.length).toFixed(1)
         });
     });
-    
+
     averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
     GeoColor.domain([averageLocationDamage[0].averagedamage,averageLocationDamage[averageLocationDamage.length-1].averagedamage]);
 }
@@ -253,5 +257,3 @@ function findIndexInArrayObject(array,value ) {
         }});
     return index;
 }
-
-
