@@ -11,9 +11,9 @@ var boxplotSvg = d3.select("#box-plot").append("svg").attr("width", boxplotWidth
 // x, y, and color Scale
 var boxplotX = d3.scaleTime().range([0, boxplotContentWidth]),
     boxplotY = d3.scaleLinear().range([0,boxplotContentHeight]).domain([10,0]);
-    // color = d3.scaleOrdinal().range(d3.schemeCategory10);
+    boxplotColor = d3.scaleOrdinal().range(d3.schemeCategory10);
 
-//color = ['#0000', '#f4429e', '#ad42f4', '#f4f142', '#ce42f4', '#f4aa42', '#42e2f4', '#42f489', '#f4f442', '#ce42f4', '#42f1f4', '#f4c542', '#f47742', '#42c5f4', '#42f4f4', '#4274f4', '#42f47d', '#eef442', '#f4c542', '#f48042'];
+//boxplotColor = ['#0000', '#f4429e', '#ad42f4', '#f4f142', '#ce42f4', '#f4aa42', '#42e2f4', '#42f489', '#f4f442', '#ce42f4', '#42f1f4', '#f4c542', '#f47742', '#42c5f4', '#42f4f4', '#4274f4', '#42f47d', '#eef442', '#f4c542', '#f48042'];
 
 // axises definition
 var boxplotXAxis = d3.axisBottom(boxplotX),
@@ -109,7 +109,7 @@ const normal_stroke_width = 2;
 const hover_strok_width = 4 ;
 
 function drawLine(boxplot,property,location) {
-    var thisColor = color(property);
+    var thisColor = boxplotColor(property);
     var data = [];
     boxplot.forEach(d=>{
         if(d.location === location && (property in d)){
