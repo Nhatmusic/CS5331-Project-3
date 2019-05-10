@@ -60,7 +60,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         viewerWidth = 1000,
         viewerHeight = 2000,
         viewerPosTop = 100,
-        viewerPosLeft = 100,
+        viewerPosLeft = 150,
         viewerPosBot = 300,
         rowLabelMargin = 10,
         legendElementWidth = cellSize * 2;
@@ -94,7 +94,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
             return "location" + i
         })
     var time_axis=svg.append("g").attr("class","x_axis")
-        .attr("transform", "translate(102," + 80 + ")")
+        .attr("transform", "translate(152," + 80 + ")")
         .call(d3.axisBottom(scale).ticks(60));
 
     svg.append("text")
@@ -213,14 +213,12 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         })
         .attr("y", 130);
 
-    var y = d3.scaleLinear().range([945, 0]).domain([19.5,0.5]);
+    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
     // Add the y Axis
     svg.append("g").attr("class","y_axis")
-        .attr("transform", "translate(50," + 100 + ")")
-        .call(d3.axisLeft(y).ticks(19));
-
-
-
+        .attr("transform", "translate(100," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
 
 });
 
@@ -234,7 +232,7 @@ svg.transition().duration(3000).selectAll(".cell")
                 return d.type*160-(d.location - 1) * 43;
             }
         });
-
+    var locationlabel=[]
     var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
     var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
     // Add the y Axis
