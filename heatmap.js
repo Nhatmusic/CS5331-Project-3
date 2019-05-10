@@ -1,4 +1,3 @@
-var parseTimeHeatGraph = d3.timeParse("%m/%d/%Y %H:%M");
 d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
     // console.log(rows);
 
