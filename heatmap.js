@@ -66,7 +66,7 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         legendElementWidth = cellSize * 2;
 
     svg = d3.select("#heatmap").append("svg")
-        .attr("width", viewerWidth)
+        .attr("width", viewerWidth+8)
         .attr("height", viewerHeight)
     var colors = colorbrewer["YlOrRd"][classesNumber];
     //create color scale to display the feature
