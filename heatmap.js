@@ -80,14 +80,14 @@ d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     var N=121;
     var array_label=[];
     array_label=Array.apply(null, {length: N}).map(Number.call, Number)
-    //create time line axis
+    //create time parallelLine axis
     // Create scale
     // var scale = d3.scaleLinear()
     //     .domain([d3.min(array_label), d3.max(array_label)])
     //     .range([0, 840]);
     var scale = d3.scaleLinear().range([0, 840]).domain([0,5]);
     var data_label = ['Mon 6',"Tue 7","Wed 8","Thu 9", "Fri 10", "Sat 11"]
-    // create svg for group of LOCATION
+    // create svg for groupGeo of LOCATION
      maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
         .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * 50})`)

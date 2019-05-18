@@ -13,9 +13,9 @@ var lineGraphMargin = {
     lineGraphPositionY = 450;
 
 // append the svg object to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var lineGraphSvg = d3.select("#line-graph").append("svg")
+// appends a 'groupGeo' element to 'svg'
+// moves the 'groupGeo' element to the top left margin
+var lineGraphSvg = d3.select("#parallelLine-graph").append("svg")
 .attr("width", lineGraphContentWidth + lineGraphMargin.left + lineGraphMargin.right)
 .attr("height", lineGraphContentHeight + lineGraphMargin.top + lineGraphMargin.bottom)
 .attr("transform", "translate(" + lineGraphPositionX + "," + lineGraphPositionY + ")")
@@ -58,10 +58,10 @@ function CleanTime(dateString) {                  // This function should be del
 
 var IGNORE_NULL_LINE_GRAPH = true;  // This is a switch that determines whether or not the null data will be ignored
 
-// define the line
+// define the parallelLine
 var linePath = d3.line()
 .defined(function(d) {
-  if (IGNORE_NULL_LINE_GRAPH) { // Conditionally ignore the null data on the line graph
+  if (IGNORE_NULL_LINE_GRAPH) { // Conditionally ignore the null data on the parallelLine graph
     return d.value >= 0;
   } else {
     return d.value;
@@ -102,20 +102,20 @@ d3.csv("./Dataset/data-optimized.csv", function(error, data) {
       } else {
         // Don't do anything for now
       }
-      return d3.mean(v, function(d) { // Calculate the mean of all the entries in this group
+      return d3.mean(v, function(d) { // Calculate the mean of all the entries in this groupGeo
         return d.medical;
       });
     })
     .entries(data);
 
-  // Make a line for each category
+  // Make a parallelLine for each category
   categoryNest.forEach(function(d, i) {
     lineGraphSvg.append("path")
-      .attr("class", "line")
+      .attr("class", "parallelLine")
       .style("stroke", function() {
         return colorByTop20Categories(d.key);
       })
-    .attr("id", "line" + d.key)
-    .attr("d", linePath(d.values)); // Draw the line
+    .attr("id", "parallelLine" + d.key)
+    .attr("d", linePath(d.values)); // Draw the parallelLine
   });
 });

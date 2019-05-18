@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Mini Challenge 1 Visualization</title>
-    <link rel="stylesheet" type="text/css" href="parallel.css">
+    <link rel="stylesheet" type="text/css" href="CSS/parallel.css">
+    <link rel="stylesheet" type="text/css" href="CSS/line-graph.css">
     <script src="https://d3js.org/d3-color.v1.min.js"></script>
     <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -15,95 +16,39 @@
     <script src="./js/underscore.js"></script>
     <script src="./js/d3-legend.min.js"></script>
 </head>
-<style>
-    .chart {
-
-    }
-
-    .main text {
-        font: 10px sans-serif;
-    }
-
-    .axis line, .axis path {
-        shape-rendering: crispEdges;
-        stroke: black;
-        fill: none;
-    }
-    .node {
-        stroke: #fff;
-        stroke-width: 1.5px;
-    }
-
-    /*.link {*/
-    /*stroke: #000000;*/
-    /*stroke-opacity: .6;*/
-    /*}*/
-
-    .axis {
-        opacity: 0.5;
-        font: 10px sans-serif;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-    }
-    .link {
-        fill: #dddddd;
-        stroke-width: 1px;
-    }
-
-    .axis .domain {
-        fill: none;
-        stroke: #000;
-        stroke-opacity: .3;
-        stroke-width: 4px;
-        stroke-linecap: round;
-    }
-
-    .axis .halo {
-        fill: none;
-        stroke: #ddd;
-        stroke-width: 3px;
-        stroke-linecap: round;
-    }
-
-    .slider .handle {
-        fill: #fff;
-        stroke: #000;
-        stroke-opacity: .5;
-        stroke-width: 1.25px;
-        cursor: grab;
-    }
-
-    #box-plot{
-      position:absolute;
-      top: 950px;
-      left: 1000px;
-    }
-
-</style>
 <body>
     <div class="header">
          Mini Challenge 1 Visualization
     </div>
-    <div class="filter">
-        <label>Select Data Filter</br></label>
-        <input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>
-        <input type="radio" name="chooseGraph" id="category"> By Location<br>
+    <br><br>
+    <!--<div class="filter">-->
+        <!--<label>Select Data Filter</br></label>-->
+        <!--<input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>-->
+        <!--<input type="radio" name="chooseGraph" id="category"> By Location<br>-->
 
-        <input type="submit" value="Choose" onclick="chooseOption()">
-        <input type="submit" value="Reset" onclick="resetAll()">
+        <!--<input type="submit" value="Choose" onclick="chooseOption()">-->
+        <!--<input type="submit" value="Reset" onclick="resetAll()">-->
+    <!--</div>-->
+
+    <div>
+        <form><label for="time-value-1" id="date-value-1"></label><input type="time" name="timeValue1" id="time-value-1" onchange="changeTime()"></form>
+        - <form><label for="time-value-2" id="date-value-2"></label><input type="time" name="timeValue2" id="time-value-2" onchange="changeTime()"></form>
+
+        <div class="col-sm-2"><p id="value-simple"></p></div>
+        <div class="col-sm"><div id="slider-simple"></div></div>
     </div>
 
-    <div id="slider">
-        <div class="col-sm-1">
-            <div id="slider-time"></div>
-        </div>
-    </div>
-    <br>
-    <div class="categoryContainer">
-        <div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>
-    </div>
-    <div id="legend-chart"></div>
+    <!--<div id="slider">-->
+        <!--<div class="col-sm-1">-->
+            <!--<div id="slider-time"></div>-->
+
+        <!--</div>-->
+    <!--</div>-->
+    <!--<br>-->
+    <!--<div class="categoryContainer">-->
+        <!--<div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>-->
+    <!--</div>-->
+    <!--<div id="legend-chart"></div>-->
     
     <div class="row">
         <div class="column">
@@ -126,10 +71,11 @@
 
     <div id="controller"></div>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="heatmap.js" ></script>
+    <script src="slider.js" ></script>
+    <!--<script src="heatmap.js" ></script>-->
     <script src="geospatial.js" ></script>
-    <script src="violin_and_boxplot.js"></script>
-    <script src="parallel.js"></script>
+    <!--<script src="lineChart.js"></script>-->
+    <!--<script src="parallel.js"></script>-->
     <script src="main.js"></script>
 </body>
 </html>

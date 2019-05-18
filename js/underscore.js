@@ -433,7 +433,7 @@
     }), 'value');
   };
 
-  // An internal function used for aggregate "group by" operations.
+  // An internal function used for aggregate "groupGeo by" operations.
   var group = function(behavior, partition) {
     return function(obj, iteratee, context) {
       var result = partition ? [[], []] : {};
@@ -447,7 +447,7 @@
   };
 
   // Groups the object's values by a criterion. Pass either a string attribute
-  // to group by, or a function that returns the criterion.
+  // to groupGeo by, or a function that returns the criterion.
   _.groupBy = group(function(result, value, key) {
     if (has(result, key)) result[key].push(value); else result[key] = [value];
   });
@@ -458,7 +458,7 @@
     result[key] = value;
   });
 
-  // Counts instances of an object that group by a certain criterion. Pass
+  // Counts instances of an object that groupGeo by a certain criterion. Pass
   // either a string attribute to count by, or a function that returns the
   // criterion.
   _.countBy = group(function(result, value, key) {

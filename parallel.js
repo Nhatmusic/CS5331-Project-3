@@ -25,9 +25,9 @@ var xAxis = d3.axisBottom(xScale),
 // Axis Group
 var xAxisGroup;
 
-// Define line
-var line = d3.line(d3.curveBasis),
-    //Background and foreground line
+// Define parallelLine
+var parallelLine = d3.line(d3.curveBasis),
+    //Background and foreground parallelLine
     foreground;
 
 //drag object
@@ -40,7 +40,7 @@ function colorByTop20Categories(category) {
     return "#000000";
 }
 
-function drawSlider() {
+function drawParallelSlider() {
     var timeRange = d3.extent(dataset, d => {
         return d.time
     });
@@ -83,7 +83,7 @@ function drawSlider() {
 
 function resetAll() {
     d3.select("svg#slider").remove();
-    drawSlider();
+    drawParallelSlider();
     graphByTimeSpan(dataset, sliderTime.value());
     filterGeoTimeSpan(sliderTime.value());
     addCheckBoxes(categories);
@@ -237,7 +237,7 @@ function drawGraph(songs, timeSpan, selectedCategories) {
         });
     foreground.style("opacity", minForegroundOpacity);
 
-    // Add a group element for each dimension.
+    // Add a groupGeo element for each dimension.
     xAxisGroup = g.selectAll(".dimension")
         .data(features)
         .enter().append("g")
@@ -331,7 +331,7 @@ function MouseOutLines(d) {
 }
 
 function path(d) {
-    return line(features.map(function (p) {
+    return parallelLine(features.map(function (p) {
         return [position(p), yScale[p](d[p])];
     }));
 }

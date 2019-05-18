@@ -44,7 +44,7 @@ var geoWidth = 900;
 var geoHeight = 600;
 
 var svgGeo = d3.select(".geospatial").append("svg").attr("width",geoWidth).attr("height",geoHeight);
-var group = svgGeo.append("g").attr("transform","translate(30,10)");
+var groupGeo = svgGeo.append("g").attr("transform","translate(30,10)");
 // var textLabel = g.append("text").attr("class","textLabel").attr("x",0).attr("y",0);
 
 // color feature
@@ -55,66 +55,13 @@ var projection = d3.geoMercator().center([-119.78,0.15]).scale(120000);
 // var projection = d3.geoAlbers().center([-119,0]);
 var geopath = d3.geoPath().projection(projection);
 
-//Time Format and Parsing
-//format of data: 2020-04-09 12:30:00
-const parseTimeGeo = d3.timeParse("%Y-%m-%d %H:%M:%S");
-const formatDayAndHour = d3.timeFormat("%m/%d/%Y %H");
-const observeTime = d3.timeParse("%m/%d/%Y %H");
-
-var initialData;
-
-// Get the data from the CSV and format it to our needs
-d3.csv("./Dataset/data-optimized.csv",function (err, rows) {
-    // console.log(rows);
-
-    rows.forEach(row=>{
-        // console.log(row.time);
-        row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
-        // console.log(row.time);
-    });
-
-    // Save the initial data for later use
-    initialData = rows;
-    initialData.columns = rows.columns;
-
-    // time range           // We don't appear to be using this
-    var timeRange = d3.extent(rows,d=>{return d.time});
-    // console.log(timeRange);
-
-    //nest data by time and sort data
-    var dataByTime = d3.nest().key(d=>d.time).entries(rows);
-    dataByTime.sort((a,b)=>new Date(a.key) - new Date(b.key));
-
-    // Draw Slider
-    var time = [];
-    dataByTime.map(d=>{time.push(d.key)});
-    drawGeoSlider(time);
-
-    const INITIAL_TIME_SPAN = 6;
-    // Take in the data and process it for the Geospatial Diagram
-    selectedGeoData = initialData.filter(function(d) {
-        return +formatTimeDay(RoundTimeDay(d.time)) === INITIAL_TIME_SPAN;
-    });
-    selectedGeoData.columns = initialData.columns;
-    analyzeDataByLocation(selectedGeoData);
-
-    // Process the GeoJSON map file for rendering the Geospatial Diagram
-    d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
-
-        // console.log(geojson);
-        drawMap(geojson.features);
-        initialize();
-    });
-
-
-});
-
 var averageLocationDamageObj;
 var averageLocationDamage;
 var locationList;
 var featuresGeo;
 // Format the data by location and analyze the damage for each location
 function analyzeDataByLocation(data) {
+    // console.log(data);
     // Clear the data each time this is called
     averageLocationDamageObj = {};
     averageLocationDamage = [];
@@ -122,8 +69,8 @@ function analyzeDataByLocation(data) {
     featuresGeo = [];
     
     // Get columns of data
-    //featuresGeo = data.columns.slice(1,8);
-    featuresGeo = data.columns.filter(d => d !== "time" && d !== "reportID");
+    // featuresGeo = data.columns.slice(1,8);
+    featuresGeo = dataset.columns.filter(d => d !== "time");
     
     // nest data by location
     //update boxplot
@@ -163,79 +110,81 @@ function analyzeDataByLocation(data) {
     GeoColor.domain(d3.extent(averageLocationDamage, function(d) { return d.averagedamage; }));
 }
 
-function getTimeFormatforSlider(time) {
-    var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    var months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','August','Sep','Oct','Nov','Dec'];
+// function getDateFormatforLabel(time) {
+//     var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+//     var months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','August','Sep','Oct','Nov','Dec'];
+//
+//
+//     // Format "Mon Apr 06 00:00"
+//     var handledDate = (time.getDate() < 10) ? "0"+time.getDate() : time.getDate();
+//
+//     return days[time.getDay()] + " "
+//         + months[time.getMonth()] + " " + handledDate + " "
+//         + time.getHours() + ":0" + time.getMinutes();
+// }
 
+// // Draw the time slider
+// function drawGeoSlider(data) {
+//
+//     var dataFullTime = [];
+//
+//     // console.log(typeof (new Date(temp)));
+//     data.map(d=>{dataFullTime.push(new Date(d))});
+//
+//     // Create slider with properties
+//     var sliderRange = d3
+//         .sliderBottom()
+//         .min(dataFullTime[0])
+//         .max(dataFullTime[dataFullTime.length-1])
+//         .step(1000*60*60)       // Step moving by hour = (milisecs * secs * mins)
+//         .width(300)
+//         // .tickFormat(d3.format('.2%'))
+//         .ticks(5)
+//         .default([dataFullTime[0],dataFullTime[dataFullTime.length-1]])
+//         .fill('#2196f3')
+//         .on('onchange', val => {
+//             var text = [];
+//             val.forEach(d=>{
+//                 if(typeof (d) != "object"){
+//                     text.push(getDateFormatforLabel(new Date(d)));
+//                 }
+//                 else
+//                     text.push(getDateFormatforLabel(d));
+//             });
+//             d3.select('p#value-simple').text(text.join(' - '));
+//             filterGeoTimeRange(val);
+//         });
+//
+//     var gRange = d3
+//         .select('div#slider-simple')
+//         .append('svg')
+//         .attr('width', 400)
+//         .attr('height', 65)
+//         .append('g')
+//         .attr('transform', 'translate(30,30)');
+//
+//     gRange.call(sliderRange);
+//
+//     d3.select('p#value-simple').text(
+//         sliderRange.value().map(d=>{return getDateFormatforLabel(d)})
+//             .join(' - ')
+//     );
+// }
 
-    // Format "Mon Apr 06 00:00"
-    var handledDate = (time.getDate() < 10) ? "0"+time.getDate() : time.getDate();
-
-    return days[time.getDay()] + " "
-        + months[time.getMonth()] + " " + handledDate + " "
-        + time.getHours() + ":0" + time.getMinutes();
-}
-
-// Draw the time slider
-function drawGeoSlider(data) {
-
-    var dataFullTime = [];
-
-    // console.log(typeof (new Date(temp)));
-    data.map(d=>{dataFullTime.push(new Date(d))});
-
-    // Create slider with properties
-    var sliderRange = d3
-        .sliderBottom()
-        .min(dataFullTime[0])
-        .max(dataFullTime[dataFullTime.length-1])
-        .step(1000*60*60)       // Step moving by hour = (milisecs * secs * mins)
-        .width(300)
-        // .tickFormat(d3.format('.2%'))
-        .ticks(5)
-        .default([dataFullTime[0],dataFullTime[dataFullTime.length-1]])
-        .fill('#2196f3')
-        .on('onchange', val => {
-            var text = [];
-            val.forEach(d=>{
-                if(typeof (d) != "object"){
-                    text.push(getTimeFormatforSlider(new Date(d)));
-                }
-                else
-                    text.push(getTimeFormatforSlider(d));
-            });
-            d3.select('p#value-simple').text(text.join(' - '));
-            filterGeoTimeRange(val);
-        });
-
-    var gRange = d3
-        .select('div#slider-simple')
-        .append('svg')
-        .attr('width', 400)
-        .attr('height', 65)
-        .append('g')
-        .attr('transform', 'translate(30,30)');
-
-    gRange.call(sliderRange);
-
-    d3.select('p#value-simple').text(
-        sliderRange.value().map(d=>{return getTimeFormatforSlider(d)})
-            .join(' - ')
-    );
-}
-
-
-
-var selectedGeoData;
 function filterGeoTimeRange(timeRange) {
-    selectedGeoData = initialData.filter(function(d) {
+    for (var index in timeRange){
+        timeRange[index] = new Date(timeRange[index]);
+    }
+    // console.log(timeRange[1]);
+    var selectedGeoData = dataset.filter(function(d) {
         return timeRange[0] <= d.time && d.time <= timeRange[1];
     });
-    selectedGeoData.columns = initialData.columns;
-    
+    // selectedGeoData.columns = initialData.columns;
+
     analyzeDataByLocation(selectedGeoData);
     updateGeoFill();
-    updateParallelByTime(timeRange);
+    // drawMap(geojsonData.features);
+    // updateParallelByTime(timeRange);
 }
 
 function filterGeoTimeSpan(timeSpan) {
@@ -256,10 +205,10 @@ function updateGeoFill() {
 
 
 // Draw the geospatial diagram
-function drawMap(data) {
+function drawMap(geojsonFeatures) {
 
     //Draw Map
-    group.selectAll("path").data(data)
+    groupGeo.selectAll("path").data(geojsonFeatures)
         .enter()
         .append("path").attr("d", geopath)
         .attr("id",d=>"geo"+d.properties.Id)
@@ -271,11 +220,11 @@ function drawMap(data) {
             var id = d.properties.Id;
             var indexInTotal = findIndexInArrayObject(averageLocationDamage,id);
 
-            group.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
+            groupGeo.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
                 .text("Id: " + id + " - "+d.properties.Nbrhood +
                     ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
                     ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
-            group.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
+            groupGeo.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
                 .text("sewer: " + averageLocationDamage[indexInTotal].sewer_and_water +
                     " - power: " + averageLocationDamage[indexInTotal].power +
                     " - Road & bridge: " + averageLocationDamage[indexInTotal].roads_and_bridges +
@@ -312,7 +261,7 @@ function drawMap(data) {
         })
 
     // Draw hospital
-    group.selectAll("geoHospitals").data(hospitals)
+    groupGeo.selectAll("geoHospitals").data(hospitals)
         .enter()
         .append("circle")
         .attr("class","geoHospitals")
@@ -320,13 +269,13 @@ function drawMap(data) {
         .attr("cy",d=>projection(d.position)[1]);
 
     // Draw the nuclear plant
-    group.append("circle")
+    groupGeo.append("circle")
         .attr("class","geoNuclear")
         .attr("cx",d=>projection(nuclearPlant)[0])
         .attr("cy",d=>projection(nuclearPlant)[1]);
 
     // Draw neighborhood text
-    group.selectAll("neighborText").data(neighborHood)
+    groupGeo.selectAll("neighborText").data(neighborHood)
         .enter()
         .append("text").attr("font-size","10px")
         .attr("id",d=>"locationText"+d.name)
@@ -344,7 +293,7 @@ function drawMap(data) {
         .text(d=>d.name);
 
     // have circle and text
-    var gGeoLabel = group.append("g").attr("transform","translate("+100+","+(geoHeight-125)+")");
+    var gGeoLabel = groupGeo.append("g").attr("transform","translate("+100+","+(geoHeight-125)+")");
 
     // hospital circle
     gGeoLabel.append("circle").attr("class","geoHospitals").attr("cx",0).attr("cy",0);
