@@ -285,4 +285,5 @@ function showdatabylocation() {
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size","5px").classed("hover", false);
         });
+    svg.select(".label_axis").remove();
 }
