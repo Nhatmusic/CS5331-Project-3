@@ -14,7 +14,7 @@ function drawGeoSlider(timeRange) {
     var sliderRange = d3.sliderBottom()
         .min(timeRange[0])
         .max(timeRange[1])
-        .step(1000*60)       // Step moving by min = (milisecs * secs)
+        .step(1000*60*5)       // Step moving by min = (milisecs * secs)
         .width(SLIDER_WIDTH-100)
         // .tickFormat(d3.format('.2%'))
         .ticks(5)

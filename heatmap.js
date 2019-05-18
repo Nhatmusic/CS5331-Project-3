@@ -1,6 +1,6 @@
-d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
+// d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
     // console.log(rows);
-
+function draw_heatmap(rows){
     rows.forEach(row => {
         row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
     });

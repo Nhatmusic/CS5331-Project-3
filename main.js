@@ -30,7 +30,7 @@ d3.csv("Dataset/mc1-reports-data.csv")
 
         rows.forEach(row=>{
             // console.log(row.time);
-            row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
+            row.time = (parseTimeGeo(row.time));
             // console.log(row.time);
         });
 
