@@ -56,12 +56,19 @@ svg {
     width:300px;
     height:410px;
 }
-
-#heatmap{
-    float: left;
+#report_line{
+    /*float: left;*/
     /*border: 1px solid black;*/
     position:absolute;
     top: 900px;
+    /*width:1008px;*/
+    /*height:1400px;*/
+}
+#heatmap{
+    /*float: left;*/
+    /*border: 1px solid black;*/
+    position:absolute;
+    top: 1200px;
     width:1008px;
     height:1400px;
 
