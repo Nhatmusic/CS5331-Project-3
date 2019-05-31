@@ -356,17 +356,6 @@ function plot_line_v4(report,data) {
     })
         .y(d => y2Scale(d.values.length));
 
-    // xAxisG.append("path")
-    //     .datum(data)
-    //     .attr("class", "area")
-    //     .attr("d", area);
-    //
-    // svg.append("defs").append("clipPath")
-    //     .attr("id", "clip")
-    //     .append("rect")
-    //     .attr("width", width)
-    //     .attr("height", height);
-
     const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
     graph.append("path").datum(data).attr("class", "area").attr("d",area);
 
@@ -374,10 +363,6 @@ function plot_line_v4(report,data) {
         .attr("class", "context")
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-    // context.append("path")
-    //     .datum(data)
-    //     .attr("class", "line")
-    //     .attr("d", lineGen2);
 
     context.append("path")
         .datum(data)
@@ -393,11 +378,6 @@ function plot_line_v4(report,data) {
         .attr("class", "brush")
         .call(brush)
         .call(brush.move, xScale.range());
-
-
-
-        // graph.append("path").datum(data).attr("d", lineGen).attr("fill", "none").attr("stroke", "black");
-
 
     svg.append("rect")
         .attr("class", "zoom")
@@ -415,7 +395,6 @@ function plot_line_v4(report,data) {
         svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
             .scale(width / (s[1] - s[0]))
             .translate(-s[0], 0));
-
         // if(! d3.event.selection){
         //     var timerange=s.map(xScale.invert)
         //     // console.log(timerange)
@@ -437,13 +416,8 @@ function plot_line_v4(report,data) {
       console.log(timerangedata)
     }
 
-        // function zoomend(){
-        // filterGeoTimeRange(timerangedata)
-        // }
-
-        // let circles = graph.selectAll("circle").data(data).enter().append("circle").call(createCircle);
-
-        function createCircle(theCircle) {
+    // let circles = graph.selectAll("circle").data(data).enter().append("circle").call(createCircle);
+    function createCircle(theCircle) {
             return theCircle.attr("cx", function (d, i) {
                 return xScale(d.values[0].time_geo)
             })

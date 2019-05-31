@@ -72,7 +72,7 @@ function draw_heatmap(rows) {
         .style("visibility", "hidden");
 
     var classesNumber = 9,
-        cellSize = 10,
+        cellSize = 12,
         viewerWidth = 3000,
         viewerHeight = 2000,
         viewerPosTop = 100,
@@ -147,7 +147,7 @@ function draw_heatmap(rows) {
         })
         .attr("x", 0)
         .attr("y", function (rowLabel, i) {
-            return (i * cellSize / 2);
+            return i * ((cellSize+2) / 2);
         })
         .style("text-anchor", "middle")
         .style("font-size", "5px")
@@ -186,14 +186,14 @@ function draw_heatmap(rows) {
         .enter().append("rect")
         .attr("x", 0)
         .attr("y", function (cell, i) {
-            return i * (cellSize + 4)/2;
+            return i * ((cellSize+2)/2);
         })
 
         .attr("class", function (cell, i) {
             return "cell " + i + " loc " + cell.location;
         })
-        .attr("width", cellSize )
-        .attr("height", cellSize/2.5 )
+        .attr("width", cellSize/2 )
+        .attr("height", cellSize/2)
         .style("fill", function (d) {
             return colorScale((d.data))
         })
