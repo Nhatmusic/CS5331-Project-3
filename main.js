@@ -18,11 +18,7 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 // const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
 // const formatTimeDay = d3.timeFormat("%d");
 
-d3.csv("Dataset/mc1-reports-data.csv")
-    .row(function (d) {
-        return d;
-    })
-    .get(function (error, rows) {
+d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
         // console.log(rows);
 
         dataset = rows;
@@ -30,7 +26,7 @@ d3.csv("Dataset/mc1-reports-data.csv")
 
         rows.forEach(row=>{
             // console.log(row.time);
-            row.time = (parseTimeGeo(row.time));
+            row.time_geo = (parseTimeGeo(row.time));
             // console.log(row.time);
         });
 
@@ -43,56 +39,39 @@ d3.csv("Dataset/mc1-reports-data.csv")
         // xScale.domain(features); // for parallel graph
 
         //nest data by time and sort data
-        var dataByTime = d3.nest().key(d=>d.time).entries(rows);
+        dataByTime = d3.nest().key(d=>d.time_geo).entries(rows);
         dataByTime.sort((a,b)=>new Date(a.key) - new Date(b.key));
+        var report_number=[];
+        dataByTime.forEach(d=>report_number.push(d.values.length));
+        console.log(report_number)
+        plot_line_v4(report_number,dataByTime)
+
+        var dataByLocation = d3.nest().key(d=>d.location).entries(rows);
+        // console.log(dataByLocation);
 
         // Draw Slider
-        var timeRange = d3.extent(rows,d=>{return new Date(d.time)});
-        drawGeoSlider(timeRange);
-        // dataset.forEach(d => {
-        //     var timeSpan = d.time = +formatTimeDay(parseTimeGeo(d.time));
-        //     features.forEach(feature => {
-        //         if (feature !== "location")
-        //             d[feature] = +d[feature];
-        //     });
-        //     //Add categories by each timeSpan
-        //     if (!categoriesByTimeSpan.hasOwnProperty(timeSpan)) {
-        //         categoriesByTimeSpan[timeSpan] = [];
-        //         categoriesByTimeSpan[timeSpan].push(d.location);
-        //     } else {
-        //         if (!categoriesByTimeSpan[timeSpan].includes(d.location))
-        //             categoriesByTimeSpan[timeSpan].push(d.location);
-        //     }
-        // });
-
-
-        // topCategoriesAll = CountCategories(dataset);
-        // topCategories20 = topCategoriesAll;
-        //
-        // // add categories after sorting
-        // categories = topCategoriesAll.map(d => d.location);
-        //
-        // drawParallelSlider();
-        // graphByTimeSpan(dataset, sliderTime.value());
-        // document.getElementById("categoryContainer").style.display = "none";
-        // Process the GeoJSON map file for rendering the Geospatial Diagram
-
-        // get calculated data for geospatial
-        analyzeDataByLocation(rows);
-
-        d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
-
-            geojsonData = geojson;
-            drawMap(geojson.features);
-            initialize();
+        var timeRange = d3.extent(rows,d=>{return new Date(d.time_geo)});
+         d3.json("./Dataset/StHimark.geojson", function(err, geojson) {
+        // geojsonData = geojson;
+             // drawMap(geojson.features, 0);
+             for (var j=0; j<6; j++) {
+                 analyzeDataByLocation(dataByLocation,j);
+                 drawMap(geojson.features,j)
+                 initialize(j);
+             }
         });
+        drawGeoSlider(timeRange);
+
+        draw_heatmap(rows)
+
+
 
     });
 
-function initialize() {
+function initialize(i) {
 
     checkedNeighborhood.forEach(id=>{
-        d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
+        d3.select("#geo"+i+id).style("fill-opacity",GEO_OPACITY_HOVER);
         d3.select("#svg"+id).transition().duration(1000).style("display",null);
     })
 
@@ -108,49 +87,6 @@ function getDataByTime(dateStart, dateEnd){
     return data;
 }
 
-// Takes a date object and rounds it down to the nearest day interval multiplied by the dayMultiplier
-// function RoundTimeDay(dateObject, dayMultiplier = 1) {
-//     let hourMultiplier =    24 *    // 1 day    - 24 hours
-//                             dayMultiplier;
-//
-//     return RoundTimeHour(dateObject, hourMultiplier);
-// }
-//
-// // Takes a date object and rounds it down to the nearest hour interval multiplied by the hourMultiplier
-// function RoundTimeHour(dateObject, hourMultiplier = 1) {
-//     let timeMultiplier =    60 *    // 1 hour   - 60 minutes
-//                             hourMultiplier;
-//
-//     return RoundTimeMinutes(dateObject, timeMultiplier);
-// }
-//
-// // Takes a date object and rounds it down to the nearest minute interval multiplied by the minuteMultiplier
-// // This function assumes that the relevant locale is the Central Time Zone of the Americas
-// function RoundTimeMinutes(dateObject, minuteMultiplier = 1) {
-//     const LOCALE_OFFSET = -5;
-//     let timeStampUTC = +dateObject; // Convert the date object to a UTC timestamp in milliseconds
-//
-//     // Account for the Central Time locale offset
-//     // Subtract the 5-hour difference to ensure rounding by Central Time and not UTC
-//     timeStampUTC += 1000    *       // 1 second - 1000 milliseconds
-//                     60      *       // 1 minute - 60 seconds
-//                     60      *       // 1 hour   - 60 minutes
-//                     LOCALE_OFFSET;  // 5 hours
-//
-//     // Subtract the remainder down to the nearest minute interval multiplied by the minuteMultiplier
-//     timeStampUTC -= timeStampUTC % (minuteMultiplier *
-//                                     1000    *  // 1 second - 1000 milliseconds
-//                                     60);       // 1 minute - 60 seconds
-//
-//     // Account for the Central Time locale offset
-//     // Add the 5-hour difference to ensure that the proper Central Time value is displayed
-//     timeStampUTC -= 1000    *       // 1 second - 1000 milliseconds
-//                     60      *       // 1 minute - 60 seconds
-//                     60      *       // 1 hour   - 60 minutes
-//                     LOCALE_OFFSET;  // 5 hours
-//
-//     return new Date(timeStampUTC);
-// }
 
 // Count the categories and return a descending frequency-ordered list of top categories
 function CountCategories(data) {    // ***We could optimize this function further, but maybe later
@@ -159,26 +95,26 @@ function CountCategories(data) {    // ***We could optimize this function furthe
     var category_queue = [];
     //(data) get from d3.csv, push all category to categories array
     data.forEach(d => { // Build the list of category occurrences
-        categories.push(d.location);
+        categories.push(d.time_geo);
     });
 
     var count;
     data.forEach((d) => {
         count = 0;
-        if (!category_queue.includes(d.location)) {    // If this category has not been counted
+        if (!category_queue.includes(d.time_geo)) {    // If this category has not been counted
             for (i = 0; i < categories.length; i++) {   // Count the occurrences of this category
-                if (categories[i] === d.location) {
+                if (categories[i] === d.time_geo) {
                     count++;
                 }
             }
-            category_queue.push(d.location);              // Mark this category as counted
-            count_category.push({location: d.location, number: count})    // Add the count of this category
+            category_queue.push(d.time);              // Mark this category as counted
+            count_category.push({time: d.time_geo, number: count})    // Add the count of this category
         }
     });
 
     //sort count_category array
     count_category.sort(function (a, b) {
-        return b.number - a.number;
+        return new Date(a.time_geo) - new Date(b.time_geo)
     });
 
     return count_category;

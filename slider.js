@@ -1,5 +1,5 @@
 function drawGeoSlider(timeRange) {
-    const SLIDER_WIDTH = 800;
+    const SLIDER_WIDTH = 1850;
     const SLIDER_HEIGHT = 80;
 
     console.log( (timeRange));
@@ -15,7 +15,7 @@ function drawGeoSlider(timeRange) {
         .min(timeRange[0])
         .max(timeRange[1])
         .step(1000*60*5)       // Step moving by min = (milisecs * secs)
-        .width(SLIDER_WIDTH-100)
+        .width(SLIDER_WIDTH)
         // .tickFormat(d3.format('.2%'))
         .ticks(5)
         .default([timeRange[0],timeRange[1]])
@@ -49,10 +49,10 @@ function drawGeoSlider(timeRange) {
     var gRange = d3
         .select('div#slider-simple')
         .append('svg')
-        .attr('width', SLIDER_WIDTH)
+        .attr('width', SLIDER_WIDTH+100)
         .attr('height', SLIDER_HEIGHT)
         .append('g')
-        .attr('transform', 'translate(30,30)');
+        .attr('transform', 'translate(100,40)');
 
     gRange.call(sliderRange);
 

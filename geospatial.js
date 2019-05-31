@@ -40,45 +40,52 @@ const GEO_OPACITY_HOVER = 0.7;
 const NORMAL_STROKE_WIDTH = 1;
 const BIGER_STROKE_WIDTH = 3;
 
-var geoWidth = 900;
-var geoHeight = 600;
+var geoWidth = 400;
+var geoHeight = 200;
 
-var svgGeo = d3.select(".geospatial").append("svg").attr("width",geoWidth).attr("height",geoHeight);
-var groupGeo = svgGeo.append("g").attr("transform","translate(30,10)");
+// var svgGeo = d3.select(".geospatial").append("svg").attr("width",geoWidth).attr("height",geoHeight);
+// var groupGeo = svgGeo.append("g").attr("transform","translate(30,10)");
 // var textLabel = g.append("text").attr("class","textLabel").attr("x",0).attr("y",0);
 
 // color feature
 // var color = d3.scaleOrdinal().range(d3.schemeCategory20);
-var GeoColor = d3.scaleLinear().range(['#1a9850','#d73027']).interpolate(d3.interpolateHcl);
+var GeoColor = colorbrewer["YlOrRd"][9];
+var colorScale = d3.scaleQuantize()
+    .domain([0, 10])
+    .range(GeoColor);
+// var GeoColor = d3.scaleSequential(d3.interpolateYlOrRd).domain([0,10])
 
 var projection = d3.geoMercator().center([-119.78,0.15]).scale(120000);
 // var projection = d3.geoAlbers().center([-119,0]);
 var geopath = d3.geoPath().projection(projection);
-
 var averageLocationDamageObj;
 var averageLocationDamage;
 var locationList;
 var featuresGeo;
+var type_feature=['shake_intensity','sewer_and_water','power','roads_and_bridges','medical','buildings']
+var geo_data=[];
+
 // Format the data by location and analyze the damage for each location
-function analyzeDataByLocation(data) {
-    // console.log(data);
+function analyzeDataByLocation(data,feature_id) {
+
     // Clear the data each time this is called
     averageLocationDamageObj = {};
     averageLocationDamage = [];
     locationList = [];
     featuresGeo = [];
-    
+
     // Get columns of data
     // featuresGeo = data.columns.slice(1,8);
     featuresGeo = dataset.columns.filter(d => d !== "time");
-    
+
     // nest data by location
-    //update boxplot
-    var dataByLocation = d3.nest().key(d=>d.location).entries(data);
+    // update boxplot
+
+
+    console.log("before")
 
     // Calculate total/average damage for each location
-    dataByLocation.forEach(location=>{
-        let totalDamage = 0;
+    data.forEach(location=>{
         let featureDamage = [];
         location.values.forEach(d=>{
             featuresGeo.forEach((feature)=>{
@@ -86,180 +93,152 @@ function analyzeDataByLocation(data) {
                     if (!featureDamage.hasOwnProperty(feature)) {
                         featureDamage[feature] = 0;
                     }
-                    totalDamage += +d[feature];
                     featureDamage[feature] += +d[feature];
             })
         });
-        
-        averageLocationDamageObj[location.key] = Math.round(totalDamage/location.values.length);
-        locationList.push(location.key);
-        averageLocationDamage.push({location: location.key,
-            totalDamage: totalDamage,
-            nReports: location.values.length,
-            averagedamage: Math.round(totalDamage / location.values.length),
-            sewer_and_water: (featureDamage["sewer_and_water"] / location.values.length).toFixed(1),
-            power: (featureDamage["power"] / location.values.length).toFixed(1),
-            roads_and_bridges: (featureDamage["roads_and_bridges"] / location.values.length).toFixed(1),
-            medical: (featureDamage["medical"] / location.values.length).toFixed(1),
-            buildings: (featureDamage["buildings"] / location.values.length).toFixed(1),
-            shake_intensity: (featureDamage["shake_intensity"] / location.values.length).toFixed(1)
-        });
-    });
+// console.log(featureDamage)
 
-    averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
-    GeoColor.domain(d3.extent(averageLocationDamage, function(d) { return d.averagedamage; }));
+        // console.log(dataByLocation)
+
+        locationList.push(location.key);
+        // averageLocationDamage.push({location: location.key,
+        //     totalDamage: totalDamage,
+        //     // nReports: location.values.length,
+        //     // averagedamage: Math.round(totalDamage / location.values.length),
+        //     // sewer_and_water: (featureDamage["sewer_and_water"] / location.values.length).toFixed(1),
+        //     // power: (featureDamage["power"] / location.values.length).toFixed(1),
+        //     // roads_and_bridges: (featureDamage["roads_and_bridges"] / location.values.length).toFixed(1),
+        //     // medical: (featureDamage["medical"] / location.values.length).toFixed(1),
+        //     // buildings: (featureDamage["buildings"] / location.values.length).toFixed(1),
+        //     averagedamage: (featureDamage[type_feature[feature_id]] / location.values.length).toFixed(1)
+        // });
+
+        averageLocationDamageObj[location.key] = featureDamage[type_feature[feature_id]] / location.values.length;
+
+
+
+    });
+    console.log("after")
+    // console.log(averageLocationDamageObj)
+    // averageLocationDamage.sort((a,b)=>{return a.averagedamage - b.averagedamage});
+
+    geo_data.push({averageLocationDamageObj: averageLocationDamageObj})
+    // console.log(geo_data)
+    // GeoColor.domain(d3.extent(averageLocationDamage, function(d) { return d.averagedamage; }));
 }
 
-// function getDateFormatforLabel(time) {
-//     var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-//     var months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','August','Sep','Oct','Nov','Dec'];
-//
-//
-//     // Format "Mon Apr 06 00:00"
-//     var handledDate = (time.getDate() < 10) ? "0"+time.getDate() : time.getDate();
-//
-//     return days[time.getDay()] + " "
-//         + months[time.getMonth()] + " " + handledDate + " "
-//         + time.getHours() + ":0" + time.getMinutes();
-// }
 
-// // Draw the time slider
-// function drawGeoSlider(data) {
-//
-//     var dataFullTime = [];
-//
-//     // console.log(typeof (new Date(temp)));
-//     data.map(d=>{dataFullTime.push(new Date(d))});
-//
-//     // Create slider with properties
-//     var sliderRange = d3
-//         .sliderBottom()
-//         .min(dataFullTime[0])
-//         .max(dataFullTime[dataFullTime.length-1])
-//         .step(1000*60*60)       // Step moving by hour = (milisecs * secs * mins)
-//         .width(300)
-//         // .tickFormat(d3.format('.2%'))
-//         .ticks(5)
-//         .default([dataFullTime[0],dataFullTime[dataFullTime.length-1]])
-//         .fill('#2196f3')
-//         .on('onchange', val => {
-//             var text = [];
-//             val.forEach(d=>{
-//                 if(typeof (d) != "object"){
-//                     text.push(getDateFormatforLabel(new Date(d)));
-//                 }
-//                 else
-//                     text.push(getDateFormatforLabel(d));
-//             });
-//             d3.select('p#value-simple').text(text.join(' - '));
-//             filterGeoTimeRange(val);
-//         });
-//
-//     var gRange = d3
-//         .select('div#slider-simple')
-//         .append('svg')
-//         .attr('width', 400)
-//         .attr('height', 65)
-//         .append('g')
-//         .attr('transform', 'translate(30,30)');
-//
-//     gRange.call(sliderRange);
-//
-//     d3.select('p#value-simple').text(
-//         sliderRange.value().map(d=>{return getDateFormatforLabel(d)})
-//             .join(' - ')
-//     );
-// }
 
 function filterGeoTimeRange(timeRange) {
-    for (var index in timeRange){
-        timeRange[index] = new Date(timeRange[index]);
-    }
-    // console.log(timeRange[1]);
-    var selectedGeoData = dataset.filter(function(d) {
-        return timeRange[0] <= d.time && d.time <= timeRange[1];
-    });
-    // selectedGeoData.columns = initialData.columns;
+    // for (var index in timeRange){
+    //     timeRange[index] = new Date(timeRange[index]);
+    // }
+    // console.log(timeRange[0])
+    // console.log(timeRange[1])
 
-    analyzeDataByLocation(selectedGeoData);
-    updateGeoFill();
+    var selectedGeoData = dataset.filter(function(d) {
+        return timeRange[0] <= d.time_geo && d.time_geo <= timeRange[1];
+    });
+    // var selected_heatmap_Data = dataset.filter(function(d) {
+    //     return timeRange[0] <= d.time_heatmap && d.time_heatmap <= timeRange[1];
+    // });
+    console.log(selectedGeoData)
+    selectedGeoData=d3.nest().key(d=>d.location).entries(selectedGeoData)
+    // selectedGeoData.columns = initialData.columns;
+    geo_data=[];
+    for (var i=0;i<6;i++) {
+        analyzeDataByLocation(selectedGeoData,i);
+        updateGeoFill(i);
+    }
+    // $("#heatmap").empty();
+    // draw_heatmap(selected_heatmap_Data)
     // drawMap(geojsonData.features);
     // updateParallelByTime(timeRange);
 }
 
-function filterGeoTimeSpan(timeSpan) {
-    selectedGeoData = initialData.filter(function(d) {
-        return +formatTimeDay(RoundTimeDay(d.time)) === timeSpan;
-    });
-    selectedGeoData.columns = initialData.columns;
-    
-    analyzeDataByLocation(selectedGeoData);
-    updateGeoFill();
-}
+// function filterGeoTimeSpan(timeSpan) {
+//     selectedGeoData = initialData.filter(function(d) {
+//         return +formatTimeDay(RoundTimeDay(d.time)) === timeSpan;
+//     });
+//     selectedGeoData.columns = initialData.columns;
+//     geo_data=[];
+//     for (var i=0;i<6;i++) {
+//         analyzeDataByLocation(selectedGeoData, i);
+//         updateGeoFill(i);
+//     }
+//
+// }
 
-function updateGeoFill() {
-    locationList.forEach(function(location) {
-        d3.select("#geo" + +location).attr("fill", function() { return GeoColor(averageLocationDamageObj[+location])})
-    });
+function updateGeoFill(i){
+
+        locationList.forEach(function (location) {
+            d3.select("#geo" + i + location).attr("fill", function () {
+                return colorScale(geo_data[i].averageLocationDamageObj[+location])
+            })
+        });
+
 }
 
 
 // Draw the geospatial diagram
-function drawMap(geojsonFeatures) {
+function drawMap(geojsonFeatures,feature_id) {
+    var svgGeo = d3.select(".geospatial"+feature_id).append("svg").attr("width",geoWidth).attr("height",geoHeight)
+        .attr('viewBox',"0 0 700 600");
+    var groupGeo = svgGeo.append("g").attr("transform","translate(30,10)");
 
     //Draw Map
     groupGeo.selectAll("path").data(geojsonFeatures)
         .enter()
         .append("path").attr("d", geopath)
-        .attr("id",d=>"geo"+d.properties.Id)
+        .attr("id",d=>"geo"+ feature_id + d.properties.Id)
         // .data(geojson)
-        .attr("fill",d=>{return GeoColor(averageLocationDamageObj[d.properties.Id.toString()])})
+        .attr("fill",d=>{return colorScale(geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()])})
         .attr("fill-opacity",GEO_OPACITY_DEFAULT)
         .attr("stroke","#222")
-        .on("mouseover",d=>{
-            var id = d.properties.Id;
-            var indexInTotal = findIndexInArrayObject(averageLocationDamage,id);
-
-            groupGeo.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
-                .text("Id: " + id + " - "+d.properties.Nbrhood +
-                    ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
-                    ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
-            groupGeo.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
-                .text("sewer: " + averageLocationDamage[indexInTotal].sewer_and_water +
-                    " - power: " + averageLocationDamage[indexInTotal].power +
-                    " - Road & bridge: " + averageLocationDamage[indexInTotal].roads_and_bridges +
-                    " - medical: " + averageLocationDamage[indexInTotal].medical +
-                    " - buildings: " + averageLocationDamage[indexInTotal].buildings +
-                    " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
-
-            d3.select("#geo"+id).attr("stroke-width",BIGER_STROKE_WIDTH);
-
-        })
-        .on("mouseout",d=>{
-            var id = d.properties.Id;
-            d3.select(".textLabel").remove();
-            d3.select(".textLabel2").remove();
-
-            d3.select("#geo"+id).attr("stroke-width",NORMAL_STROKE_WIDTH);
-
-        })
-        .on("click",d=>{
-            var id = d.properties.Id.toString();
-            if(!checkedNeighborhood.includes(id)){
-                checkedNeighborhood.push(id);
-                d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
-                d3.select("#svg"+id).transition().duration(1000).style("display",null);
-                // graphByCategory([id],ADD_CODE);
-            }
-            else {
-                checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
-                d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
-                d3.select("#svg"+id).transition().duration(1000).style("display","none");
-                // graphByCategory([id],DELETE_CODE);
-            }
-
-        })
-
+        // .on("mouseover",d=>{
+        //     var id = d.properties.Id;
+        //     // var indexInTotal = findIndexInArrayObject(averageLocationDamage,id);
+        //
+        //     // groupGeo.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
+        //     //     .text("Id: " + id + " - "+d.properties.Nbrhood +
+        //     //         ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
+        //     //         ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
+        //     // groupGeo.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
+        //     //     .text("sewer: " + averageLocationDamage[indexInTotal].sewer_and_water +
+        //     //         " - power: " + averageLocationDamage[indexInTotal].power +
+        //     //         " - Road & bridge: " + averageLocationDamage[indexInTotal].roads_and_bridges +
+        //     //         " - medical: " + averageLocationDamage[indexInTotal].medical +
+        //     //         " - buildings: " + averageLocationDamage[indexInTotal].buildings +
+        //     //         " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
+        //
+        //     d3.select("#geo"+ feature_id+ id).attr("stroke-width",BIGER_STROKE_WIDTH);
+        //
+        // })
+        // .on("mouseout",d=>{
+        //     var id = d.properties.Id;
+        //     d3.select(".textLabel").remove();
+        //     d3.select(".textLabel2").remove();
+        //
+        //     d3.select("#geo"+id).attr("stroke-width",NORMAL_STROKE_WIDTH);
+        //
+        // })
+        // .on("click",d=>{
+        //     var id = d.properties.Id.toString();
+        //     if(!checkedNeighborhood.includes(id)){
+        //         checkedNeighborhood.push(id);
+        //         d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
+        //         d3.select("#svg"+id).transition().duration(1000).style("display",null);
+        //         // graphByCategory([id],ADD_CODE);
+        //     }
+        //     else {
+        //         checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
+        //         d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
+        //         d3.select("#svg"+id).transition().duration(1000).style("display","none");
+        //         // graphByCategory([id],DELETE_CODE);
+        //     }
+        //
+        // })
+    //
     // Draw hospital
     groupGeo.selectAll("geoHospitals").data(hospitals)
         .enter()
@@ -292,19 +271,6 @@ function drawMap(geojsonFeatures) {
         })
         .text(d=>d.name);
 
-    // have circle and text
-    var gGeoLabel = groupGeo.append("g").attr("transform","translate("+100+","+(geoHeight-125)+")");
-
-    // hospital circle
-    gGeoLabel.append("circle").attr("class","geoHospitals").attr("cx",0).attr("cy",0);
-    gGeoLabel.append("text").attr("x",15).attr("y",4).text("Hospitals");
-
-    // hospital circle
-    gGeoLabel.append("circle").attr("class","geoNuclear").attr("cx",0).attr("cy",25);
-    gGeoLabel.append("text").attr("x",15).attr("y",30).text("Nuclear plant");
-
-
-
 }
 
 function findIndexInArrayObject(array,value ) {
@@ -314,4 +280,186 @@ function findIndexInArrayObject(array,value ) {
             index = i;
         }});
     return index;
+}
+
+function plot_line_v4(report,data) {
+        var svg = d3.select("#report_line")
+                .append("svg")
+                .attr("width", 1900)
+                .attr("height", 200)
+                .attr("transform", 'translate(50,-20)'),
+            margin = {top: 10, right: 20, bottom: 35, left: 40},
+            margin2 = {top: 165, right: 20, bottom: 15, left: 40},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom,
+            height2 = +svg.attr("height") - margin2.top - margin2.bottom;
+            // contentWidth = width - margin.left - margin.right,
+            // contentHeight = height - margin.top - margin.bottom;
+
+        var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", width)
+        .attr("height", height )
+        .attr("x", 0)
+        .attr("y", 0);
+        // //Build tooltip
+        let div = d3.select("#report_line").append("div").attr("opacity", 0);
+
+        //Build the xAsis
+        var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left}, ${margin.top + height})`);
+        const xScale = d3.scaleTime().domain(d3.extent(data, function(d) { return d.values[0].time_geo; })).range([0, width]);
+        const x2Scale = d3.scaleTime().domain(d3.extent(data, function(d) { return d.values[0].time_geo; })).range([0, width]);
+        const xAxis = d3.axisBottom(xScale);
+        const xAxis2= d3.axisBottom(x2Scale);
+        xAxisG.call(xAxis)
+
+
+        const yAxisG = svg.append('g').attr("transform", `translate(${margin.left}, ${margin.top})`);
+        const yScale = d3.scaleLinear().domain([0, math.max(report)]).range([height, 0]);
+        const y2Scale = d3.scaleLinear().domain([0, math.max(report)]).range([height2, 0]);
+        const yAxis = d3.axisLeft(yScale);
+        yAxisG.call(yAxis);
+    var brush = d3.brushX()
+        .extent([[0, 0], [width, height2]])
+        .on("brush end", brushed);
+
+        var zoom = d3.zoom()
+        .scaleExtent([1, Infinity])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
+        .on("zoom", zoomed);
+            // .on("end", zoomend);
+
+
+        const area = d3.area()
+            .curve(d3.curveMonotoneX)
+            .x(function (d) {
+            return xScale(d.values[0].time_geo)
+        })
+            .y0(height)
+            .y1(d => yScale(d.values.length));
+        const lineGen = d3.line().x(function (d) {
+            return xScale(d.values[0].time_geo)
+        })
+            .y(d => yScale(d.values.length));
+
+    const area2 = d3.area()
+        .curve(d3.curveMonotoneX)
+        .x(function (d) {
+        return x2Scale(d.values[0].time_geo)
+    })
+        .y0(height2)
+        .y1(d => y2Scale(d.values.length));
+    const lineGen2 = d3.line().x(function (d) {
+        return x2Scale(d.values[0].time_geo)
+    })
+        .y(d => y2Scale(d.values.length));
+
+    // xAxisG.append("path")
+    //     .datum(data)
+    //     .attr("class", "area")
+    //     .attr("d", area);
+    //
+    // svg.append("defs").append("clipPath")
+    //     .attr("id", "clip")
+    //     .append("rect")
+    //     .attr("width", width)
+    //     .attr("height", height);
+
+    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
+    graph.append("path").datum(data).attr("class", "area").attr("d",area);
+
+    var context = svg.append("g")
+        .attr("class", "context")
+        .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+    // context.append("path")
+    //     .datum(data)
+    //     .attr("class", "line")
+    //     .attr("d", lineGen2);
+
+    context.append("path")
+        .datum(data)
+        .attr("class", "area")
+        .attr("d", area2);
+
+    context.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height2 + ")")
+        .call(xAxis2);
+
+    context.append("g")
+        .attr("class", "brush")
+        .call(brush)
+        .call(brush.move, xScale.range());
+
+
+
+        // graph.append("path").datum(data).attr("d", lineGen).attr("fill", "none").attr("stroke", "black");
+
+
+    svg.append("rect")
+        .attr("class", "zoom")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoom);
+
+    function brushed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+        var s = d3.event.selection || x2Scale.range();
+        xScale.domain(s.map(x2Scale.invert, x2Scale));
+        graph.select(".area").attr("d", area);
+        xAxisG.call(xAxis);
+        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+            .scale(width / (s[1] - s[0]))
+            .translate(-s[0], 0));
+
+        // if(! d3.event.selection){
+        //     var timerange=s.map(xScale.invert)
+        //     // console.log(timerange)
+        //     filterGeoTimeRange(timerange)
+        // }
+
+    }
+
+    function zoomed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        var t = d3.event.transform;
+        xScale.domain(t.rescaleX(x2Scale).domain());
+        graph.select(".area").attr("d", area);
+        xAxisG.call(xAxis);
+        context.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
+        var s=xScale.range().map(t.invertX, t)
+         timerangedata=s.map(x2Scale.invert)
+        filterGeoTimeRange(timerangedata)
+      console.log(timerangedata)
+    }
+
+        // function zoomend(){
+        // filterGeoTimeRange(timerangedata)
+        // }
+
+        // let circles = graph.selectAll("circle").data(data).enter().append("circle").call(createCircle);
+
+        function createCircle(theCircle) {
+            return theCircle.attr("cx", function (d, i) {
+                return xScale(d.values[0].time_geo)
+            })
+                .attr("cy", d => yScale(d.values.length))
+                .attr("r", 0.5)
+                .style("fill", "black")
+                .on("mouseover", function (d,i){
+                    graph.style("display",null)
+                    div.style('left', d3.event.pageX + "px").style("top", (d3.event.pageY-1000) + "px");
+                    div.style("opacity", 1);
+                    div.html("Report Quantity: " + d.values.length + "</br>" +"Time: " + d.values[0].time_geo + "</br>");
+                })
+                .on("mouseout", d=>{
+                    graph.style("display", "none");
+                    div.transition().style("opacity", 0);
+                });
+        }
+
 }

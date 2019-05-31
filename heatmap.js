@@ -1,15 +1,20 @@
 // d3.csv("./Dataset/mc1-reports-data.csv",function (err, rows) {
-    // console.log(rows);
-function draw_heatmap(rows){
-    rows.forEach(row => {
-        row.time = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
+//     console.log(rows);
+function draw_heatmap(rows) {
+    dataset.forEach(row => {
+        row.time_heatmap = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
+        // row.time_heatmap = parseTimeGeo(row.time)
     });
     //get data of each location by time and sort
-     dataByTime = d3.nest().key(d => d.location).key(d => d.time).entries(rows);
+    var dataByTime = d3.nest().key(d => d.location).key(d => d.time_heatmap).entries(rows);
     dataByTime.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
+
+    var dataByTime_Time = d3.nest().key(d => d.time_heatmap).entries(rows);
+    dataByTime_Time.sort((a, b) => new Date(a.key) - new Date(b.key));
     var timestep = [];
-    var store_reportnum=[];
-    dataByTime[1].values.forEach((d,i) => timestep.push(d.key))
+    var store_reportnum = [];
+    dataByTime_Time.forEach((d, i) => timestep.push(d.key))
+    console.log(timestep)
     dataByTime.forEach(d => d.values.forEach(d => d.time_step = timestep.indexOf(d.key)));
     var array_data3 = [];
     dataByTime.forEach(d => {
@@ -18,20 +23,26 @@ function draw_heatmap(rows){
             var array_data1 = [];
             d1.values.forEach(d2 => {
 
-                array_data1.push([+d2.shake_intensity, +d2.medical, +d2.buildings,+d2.power, +d2.roads_and_bridges, +d2.sewer_and_water])
+                array_data1.push([+d2.shake_intensity, +d2.medical, +d2.buildings, +d2.power, +d2.roads_and_bridges, +d2.sewer_and_water])
             })
-            array_data2.push({"value": array_data1, "step": d1.time_step, "noreport":d1.values.length, "location":d.key })
+            array_data2.push({
+                "value": array_data1,
+                "step": d1.time_step,
+                "noreport": d1.values.length,
+                "location": d.key
+            })
             store_reportnum.push(d1.values.length)
 
         })
         array_data3.push(array_data2)
     });
 
+    console.log(dataByTime)
     //scale the number of report to [0,1];
-    var report_scale = d3.scaleLinear().domain([math.min(store_reportnum),math.max(store_reportnum)]).range([0,1]);
+    var report_scale = d3.scaleLinear().domain([math.min(store_reportnum), math.max(store_reportnum)]).range([0, 1]);
 
     var array_data_mean = [];
-     array_data_mean4 = [];
+    array_data_mean4 = [];
 
     array_data3.forEach(d => {
         var array_data_mean3 = [];
@@ -42,7 +53,12 @@ function draw_heatmap(rows){
             array_data_mean.forEach(d2 =>
                 array_data_mean2.push(math.mean(d2))
             )
-            array_data_mean3.push({"data": array_data_mean2, "step": d1.step ,"noreport": d1.noreport, "location":parseInt(d1.location)})
+            array_data_mean3.push({
+                "data": array_data_mean2,
+                "step": d1.step,
+                "noreport": d1.noreport,
+                "location": parseInt(d1.location)
+            })
         })
         array_data_mean4.push(array_data_mean3)
 
@@ -57,7 +73,7 @@ function draw_heatmap(rows){
 
     var classesNumber = 9,
         cellSize = 10,
-        viewerWidth = 1000,
+        viewerWidth = 3000,
         viewerHeight = 2000,
         viewerPosTop = 100,
         viewerPosLeft = 150,
@@ -65,45 +81,61 @@ function draw_heatmap(rows){
         rowLabelMargin = 10,
         legendElementWidth = cellSize * 2;
 
+    // zoomed = ()=>{
+    //     const {x,y,k} = d3.event.transform
+    //     let t = d3.zoomIdentity
+    //     t =  t.translate(x,y).scale(k).translate(50,50)
+    //     svg.attr("transform", t)
+    // }
+    // var zoom = d3.zoom()
+    //     .scaleExtent([1, 8])
+    //     .on("zoom", zoomed);
+
     svg = d3.select("#heatmap").append("svg")
-        .attr("width", viewerWidth+8)
-        .attr("height", viewerHeight)
+        .attr("width", viewerWidth + 8)
+        .attr("height", viewerHeight);
+        // .call(zoom);
+
+
+
     var colors = colorbrewer["YlOrRd"][classesNumber];
     //create color scale to display the feature
     var colorScale = d3.scaleQuantize()
         .domain([0, 10])
         .range(colors);
-    rowLabelData =  ["shake_intensity","medical","buidings","power","roads_bridges","sewer_water"]
+    rowLabelData = ["shake_intensity", "medical", "buidings", "power", "roads_bridges", "sewer_water"]
 
 
     // Add scales to axis
-    var N=121;
-    var array_label=[];
-    array_label=Array.apply(null, {length: N}).map(Number.call, Number)
+    var N = 121;
+    var array_label = [];
+    array_label = Array.apply(null, {length: N}).map(Number.call, Number)
     //create time parallelLine axis
     // Create scale
     // var scale = d3.scaleLinear()
     //     .domain([d3.min(array_label), d3.max(array_label)])
     //     .range([0, 840]);
-    var scale = d3.scaleLinear().range([0, 840]).domain([0,5]);
-    var data_label = ['Mon 6',"Tue 7","Wed 8","Thu 9", "Fri 10", "Sat 11"]
+    var scale = d3.scaleLinear().range([0, 840]).domain([0, 5]);
+    var data_label = ['Mon 6', "Tue 7", "Wed 8", "Thu 9", "Fri 10", "Sat 11"]
     // create svg for groupGeo of LOCATION
-     maing = svg.selectAll('g').data(array_data_mean4).enter()
+    maing = svg.selectAll('g').data(array_data_mean4).enter()
         .append("g")
         .attr("transform", (song, i) => `translate(${viewerPosLeft},${viewerPosTop + i * 50})`)
         .attr("id", function (d, i) {
             return "location" + i
         })
 
-    var time_axis=svg.append("g").attr("class","x_axis")
-        .attr("transform", "translate(152," + 80 + ")")
-        .call(d3.axisBottom(scale).ticks(5).tickFormat(function(d) { return data_label[d]; }));
-
-    svg.append("text")
-        .attr("transform",
-            "translate(520,70)")
-        .style("text-anchor", "middle")
-        .text("Time(hours)");
+    // var time_axis = svg.append("g").attr("class", "x_axis")
+    //     .attr("transform", "translate(152," + 80 + ")")
+    //     .call(d3.axisBottom(scale).ticks(5).tickFormat(function (d) {
+    //         return data_label[d];
+    //     }));
+    //
+    // svg.append("text")
+    //     .attr("transform",
+    //         "translate(520,70)")
+    //     .style("text-anchor", "middle")
+    //     .text("Time(hours)");
 //create row label
     var rowLabels = maing.append("g")
         .attr("class", "rowLabels")
@@ -115,7 +147,7 @@ function draw_heatmap(rows){
         })
         .attr("x", 0)
         .attr("y", function (rowLabel, i) {
-            return (i*cellSize/1.4 );
+            return (i * cellSize / 2);
         })
         .style("text-anchor", "middle")
         .style("font-size", "5px")
@@ -127,59 +159,59 @@ function draw_heatmap(rows){
             return "rowLabel_" + i;
         })
         .on('mouseover', function (d, i) {
-            d3.select(this).style("font-size","10px").classed("hover", true);
+            d3.select(this).style("font-size", "10px").classed("hover", true);
         })
         .on('mouseout', function (d, i) {
-            d3.select(this).style("font-size","5px").classed("hover", false);
-        });;
+            d3.select(this).style("font-size", "5px").classed("hover", false);
+        });
 
     rowss = maing.selectAll(".row")
-        .data(rows=>rows)
-            .enter().append("g")
+        .data(rows => rows)
+        .enter().append("g")
         .attr("class", "row")
-        .attr("transform", (row) => `translate(${row.step*(cellSize+4)/2},0)`)
-        .attr("class", function (d,i){
-            return "column"+d.step;
+        .attr("transform", (row) => `translate(${row.step * (cellSize + 4) },0)`)
+        .attr("class", function (d, i) {
+            return "column" + d.step;
         });
-    var j,l;
-     var heatmap = rowss.selectAll(".cell")
-        .data(function(row) {
+    var j, l;
+    var heatmap = rowss.selectAll(".cell")
+        .data(function (row) {
             j = row.noreport;
             l = row.location;
-            return row.data.map((d,i) => {
-                return {data: d, report: j, location: l, type:i}
+            k = row.step;
+            return row.data.map((d, i) => {
+                return {data: d, report: j, location: l, type: i, timestep: k}
             });
         })
         .enter().append("rect")
         .attr("x", 0)
-        .attr("y", function (cell,i) {
-            return i * (cellSize+4) / 2;
+        .attr("y", function (cell, i) {
+            return i * (cellSize + 4)/2;
         })
-        // .attr("rx", 2)
-        // .attr("ry", 2)
+
         .attr("class", function (cell, i) {
-            return "cell " + i + " loc " +cell.location;
+            return "cell " + i + " loc " + cell.location;
         })
-        .attr("width", cellSize / 2)
-        .attr("height", cellSize / 2)
-        .style("fill", function (d){
+        .attr("width", cellSize )
+        .attr("height", cellSize/2.5 )
+        .style("fill", function (d) {
             return colorScale((d.data))
         })
-        .attr("stroke-width", function(d){
+        .attr("stroke-width", function (d) {
             return report_scale(d.report);
         })
-        .attr("stroke","black")
+        .attr("stroke", "black")
 
         .on('mouseover', function (cell) {
-                tooltip.html('<div class="heatmap_tooltip">' + "Location: " + cell.location +  "<br/>"+ "Report Quantity: " + cell.report +  "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) +  "<br/>" + '</div>');
-                tooltip.style("visibility", "visible");
+            tooltip.html('<div class="heatmap_tooltip">' + "Time: " + timestep[cell.timestep] + "<br/>"  + "Location: " + cell.location + "<br/>" + "Report Quantity: " + cell.report + "<br/>" + "Average Damage Level: " + cell.data.toFixed(2) + "<br/>" + '</div>');
+            tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
             d3.select(this).classed("hover", false);
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 910) + "px").style("left", (d3.event.pageX - 65) + "px");
+            tooltip.style("top", (d3.event.pageY - 1050) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
 
     var legend = svg.append("g")
@@ -206,7 +238,7 @@ function draw_heatmap(rows){
 
     legend.append("text")
         .attr("class", "mono legendElement")
-        .attr("font-size","10px")
+        .attr("font-size", "10px")
         .text(function (d) {
             return "≥" + Math.round(d * 100) / 100;
         })
@@ -215,14 +247,18 @@ function draw_heatmap(rows){
         })
         .attr("y", 130);
 
-    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
-    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
+    var Location_label = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19, 0]);
     // Add the y Axis
-    svg.append("g").attr("class","y_axis")
+    svg.append("g").attr("class", "y_axis")
         .attr("transform", "translate(100," + 100 + ")")
-        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function (d) {
+            return Location_label[d];
+        }));
+    dataByTime=[];
+}
+// })
 
-});
 
 function showdatabyfeature() {
 var a=[0,1,2,3,4,5]

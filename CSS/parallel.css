@@ -8,19 +8,60 @@ svg {
     shape-rendering: crispEdges;
 }
 
-.geospatial {
+.geospatial0 {
     float: left;
     /*border: 1px solid black;*/
-    left: 920px;
-    position:absolute;
-    width:500px;
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
     height:410px;
 }
+.geospatial1 {
+    float: left;
+    /*border: 1px solid black;*/
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
+    height:410px;
+}
+.geospatial2 {
+    float: left;
+    /*border: 1px solid black;*/
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
+    height:410px;
+}
+.geospatial3 {
+    float: left;
+    /*border: 1px solid black;*/
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
+    height:410px;
+}
+.geospatial4 {
+    float: left;
+    /*border: 1px solid black;*/
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
+    height:410px;
+}
+.geospatial5 {
+    float: left;
+    /*border: 1px solid black;*/
+    /*left: 10px;*/
+    /*position:absolute;*/
+    width:300px;
+    height:410px;
+}
+
 #heatmap{
     float: left;
     /*border: 1px solid black;*/
     position:absolute;
-    top: 800px;
+    top: 900px;
     width:1008px;
     height:1400px;
 
@@ -148,22 +189,28 @@ h3 {
     font-size: 20px;
     text-align: center;
 }
+h4 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    text-align: center;
+}
+
 
 #slider-time{
     position: relative;
     width: 200px;
     height: 100px;
 }
+
 .col-sm-1{
     position: relative;
     width: 200px;
     height: 100px;
 }
 
-#slider{
-    position: relative;
-    width:250px;
-    height:100px;
+#slider-simple{
+    position: absolute;
+   top: 600px;
 }
 #legend-chart {
     position: absolute;
@@ -301,3 +348,13 @@ text.hover {
 
 #button2:hover {background-color: deepskyblue;
 }
+
+.area{
+    fill: steelblue;
+}
+.zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+}
+
