@@ -85,33 +85,33 @@ function draw_heatmap(rows,store_reportnum,timestep,time_origin) {
 
 
 //create row label
-//     var rowLabels = maing.append("g")
-//         .attr("class", "rowLabels")
-//         .selectAll(".rowLabel")
-//         .data(rowLabelData)
-//         .enter().append("text")
-//         .text(function (rowLabel) {
-//             return rowLabel
-//         })
-//         .attr("x", 0)
-//         .attr("y", function (rowLabel, i) {
-//             return i * ((cellSize+2) / 2);
-//         })
-//         .style("text-anchor", "middle")
-//         .style("font-size", "5px")
-//         .attr("transform", function (rowLabel) {
-//             return `translate(-20, ${4})`;
-//         })
-//         .attr("class", "rowLabel mono")
-//         .attr("id", function (rowLabel, i) {
-//             return "rowLabel_" + i;
-//         })
-//         .on('mouseover', function (d, i) {
-//             d3.select(this).style("font-size", "10px").classed("hover", true);
-//         })
-//         .on('mouseout', function (d, i) {
-//             d3.select(this).style("font-size", "5px").classed("hover", false);
-//         });
+    var rowLabels = maing.append("g")
+        .attr("class", "rowLabels")
+        .selectAll(".rowLabel")
+        .data(rowLabelData)
+        .enter().append("text")
+        .text(function (rowLabel) {
+            return rowLabel
+        })
+        .attr("x", 0)
+        .attr("y", function (rowLabel, i) {
+            return i * ((cellSize+2) / 2);
+        })
+        .style("text-anchor", "middle")
+        .style("font-size", "5px")
+        .attr("transform", function (rowLabel) {
+            return `translate(-20, ${4})`;
+        })
+        .attr("class", "rowLabel mono")
+        .attr("id", function (rowLabel, i) {
+            return "rowLabel_" + i;
+        })
+        .on('mouseover', function (d, i) {
+            d3.select(this).style("font-size", "10px").classed("hover", true);
+        })
+        .on('mouseout', function (d, i) {
+            d3.select(this).style("font-size", "5px").classed("hover", false);
+        });
 // create svg for groupGeo of LOCATION
 
     var legend = svg_heatmap.append("g")
