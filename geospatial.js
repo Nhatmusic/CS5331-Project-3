@@ -130,18 +130,18 @@ function analyzeDataByLocation(data,feature_id) {
 
 
 function filterGeoTimeRange(timeRange) {
-    // for (var index in timeRange){
-    //     timeRange[index] = new Date(timeRange[index]);
-    // }
-    // console.log(timeRange[0])
-    // console.log(timeRange[1])
 
     var selectedGeoData = dataset.filter(function(d) {
         return timeRange[0] <= d.time_geo && d.time_geo <= timeRange[1];
     });
-    // var selected_heatmap_Data = dataset.filter(function(d) {
-    //     return timeRange[0] <= d.time_heatmap && d.time_heatmap <= timeRange[1];
-    // });
+
+    selectedHeatmap_data=[];
+    array_data_mean4.forEach(function(d) {
+    return selectedHeatmap_data.push(d.filter(function(d1){ return timerangedata[0] <= d1.time && d1.time <= timerangedata[1];}))
+})
+    console.log("heatmapdata" + selectedHeatmap_data)
+    svg_heatmap.selectAll("g").remove();
+    Update_heatmap(selectedHeatmap_data,report_scale,colorScale,tooltip,legendElementWidth,colors)
     console.log(selectedGeoData)
     selectedGeoData=d3.nest().key(d=>d.location).entries(selectedGeoData)
     // selectedGeoData.columns = initialData.columns;
@@ -195,50 +195,7 @@ function drawMap(geojsonFeatures,feature_id) {
         .attr("fill",d=>{return colorScale(geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()])})
         .attr("fill-opacity",GEO_OPACITY_DEFAULT)
         .attr("stroke","#222")
-        // .on("mouseover",d=>{
-        //     var id = d.properties.Id;
-        //     // var indexInTotal = findIndexInArrayObject(averageLocationDamage,id);
-        //
-        //     // groupGeo.append("text").attr("class","textLabel").attr("x",0).attr("y",5).style("font-size","20px")
-        //     //     .text("Id: " + id + " - "+d.properties.Nbrhood +
-        //     //         ", dmg: " + averageLocationDamageObj[d.properties.Id.toString()] +
-        //     //         ", reportNo. " + averageLocationDamage[indexInTotal].nReports);
-        //     // groupGeo.append("text").attr("class","textLabel2").attr("x",0).attr("y",25).style("font-size","20px")
-        //     //     .text("sewer: " + averageLocationDamage[indexInTotal].sewer_and_water +
-        //     //         " - power: " + averageLocationDamage[indexInTotal].power +
-        //     //         " - Road & bridge: " + averageLocationDamage[indexInTotal].roads_and_bridges +
-        //     //         " - medical: " + averageLocationDamage[indexInTotal].medical +
-        //     //         " - buildings: " + averageLocationDamage[indexInTotal].buildings +
-        //     //         " - shake_intensity: " + averageLocationDamage[indexInTotal].shake_intensity);
-        //
-        //     d3.select("#geo"+ feature_id+ id).attr("stroke-width",BIGER_STROKE_WIDTH);
-        //
-        // })
-        // .on("mouseout",d=>{
-        //     var id = d.properties.Id;
-        //     d3.select(".textLabel").remove();
-        //     d3.select(".textLabel2").remove();
-        //
-        //     d3.select("#geo"+id).attr("stroke-width",NORMAL_STROKE_WIDTH);
-        //
-        // })
-        // .on("click",d=>{
-        //     var id = d.properties.Id.toString();
-        //     if(!checkedNeighborhood.includes(id)){
-        //         checkedNeighborhood.push(id);
-        //         d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_HOVER);
-        //         d3.select("#svg"+id).transition().duration(1000).style("display",null);
-        //         // graphByCategory([id],ADD_CODE);
-        //     }
-        //     else {
-        //         checkedNeighborhood.splice([checkedNeighborhood.indexOf(id)],1);
-        //         d3.select("#geo"+id).style("fill-opacity",GEO_OPACITY_DEFAULT);
-        //         d3.select("#svg"+id).transition().duration(1000).style("display","none");
-        //         // graphByCategory([id],DELETE_CODE);
-        //     }
-        //
-        // })
-    //
+
     // Draw hospital
     groupGeo.selectAll("geoHospitals").data(hospitals)
         .enter()
@@ -271,15 +228,6 @@ function drawMap(geojsonFeatures,feature_id) {
         })
         .text(d=>d.name);
 
-}
-
-function findIndexInArrayObject(array,value ) {
-    var index = 0;
-    array.forEach((loc,i)=>{
-        if(loc.location===value.toString()){
-            index = i;
-        }});
-    return index;
 }
 
 function plot_line_v4(report,data) {
@@ -395,11 +343,6 @@ function plot_line_v4(report,data) {
         svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
             .scale(width / (s[1] - s[0]))
             .translate(-s[0], 0));
-        // if(! d3.event.selection){
-        //     var timerange=s.map(xScale.invert)
-        //     // console.log(timerange)
-        //     filterGeoTimeRange(timerange)
-        // }
 
     }
 
@@ -437,3 +380,4 @@ function plot_line_v4(report,data) {
         }
 
 }
+
