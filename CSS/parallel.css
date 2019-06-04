@@ -358,6 +358,21 @@ text.hover {
     cursor: pointer;
 }
 
+#button3 {
+    background-color: #4CAF50; /* Green */
+    border: 2px solid gray;
+    color: white;
+    padding: 5px 64px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    font-size: 10px;
+    position: absolute;
+    top: 70px;
+    left: 300px;
+    cursor: pointer;
+}
+
 .grid {
     font-size: 8px;
 }

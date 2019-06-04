@@ -141,7 +141,8 @@ function filterGeoTimeRange(timeRange) {
 })
     console.log("heatmapdata" + selectedHeatmap_data)
     svg_heatmap.selectAll("g").remove();
-    Update_heatmap(selectedHeatmap_data,report_scale,colorScale,tooltip,legendElementWidth,colors)
+    var cellSize = 4;
+    Update_heatmap(selectedHeatmap_data,cellSize)
     console.log(selectedGeoData)
     selectedGeoData=d3.nest().key(d=>d.location).entries(selectedGeoData)
     // selectedGeoData.columns = initialData.columns;

@@ -36,9 +36,6 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
             element !== "time");
     });
     var time_step_origin = [];
-
-    // var databyorigintime=d3.nest().key(d=>d.time).entries(rows);
-    //     databyorigintime.forEach((d, i) => time_step_origin.push(d.key))
     //nest data by time and sort data
     dataByTime = d3.nest().key(d => d.time_geo).entries(rows);
     dataByTime.sort((a, b) => new Date(a.key) - new Date(b.key));
@@ -116,8 +113,8 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
 
     });
 
-    var cellSize = 4;
-    var viewerWidth = 3000,
+    var cellSize = 3;
+    var viewerWidth = 5000,
         viewerHeight = 2000,
         viewerPosTop = 100,
         viewerPosLeft = 150;
@@ -135,7 +132,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         .range(colors);
     rowLabelData = ["shake_intensity", "medical", "buidings", "power", "roads_bridges", "sewer_water"]
 
-    Update_heatmap(array_data_mean4, report_scale, colorScale, cellSize, legendElementWidth, colors)
+    Update_heatmap(array_data_mean4,cellSize)
 
 
     d3.json("./Dataset/StHimark.geojson", function (err, geojson) {
@@ -147,15 +144,73 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
             initialize(j);
         }
     });
-    drawGeoSlider(timeRange);
+    // drawGeoSlider(timeRange);
 
     // draw_heatmap(rows,report_number,timestep,time_step_origin)
 
 
 });
 
-function Update_heatmap(data, report_scale, colorScale) {
-    var cellSize = 2;
+function updatebyhour() {
+    svg_heatmap.selectAll("g").remove();
+    var cellSize = 10;
+    dataset.forEach(row => {
+        row.time_heatmap = observeTime(formatDayAndHour(parseTimeGeo(row.time)));
+    });
+    var timestep = [];
+    //get data of each location by time and sort
+    var dataByTime_Heatmap = d3.nest().key(d => d.location).key(d => d.time_heatmap).entries(dataset);
+    dataByTime_Heatmap.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
+    dataByTime_Heatmap[1].values.forEach(d => timestep.push(d.key))
+    dataByTime_Heatmap.forEach(d => d.values.forEach(d => d.time_step = timestep.indexOf(d.key)));
+    var array_data3 = [];
+    dataByTime_Heatmap.forEach(d => {
+        var array_data2 = [];
+        d.values.forEach(d1 => {
+            var array_data1 = [];
+            d1.values.forEach(d2 => {
+                array_data1.push([+d2.shake_intensity, +d2.medical, +d2.buildings, +d2.power, +d2.roads_and_bridges, +d2.sewer_and_water])
+            })
+            array_data2.push({
+                "value": array_data1,
+                "step": d1.time_step,
+                "noreport": d1.values.length,
+                "location": d.key,
+            })
+            // store_reportnum.push(d1.values.length)
+        })
+        array_data3.push(array_data2)
+    });
+
+    var array_data_mean = [];
+    var array_data_mean_hour = [];
+
+    array_data3.forEach(d => {
+        var array_data_mean3 = [];
+        d.forEach(d1 => {
+
+            array_data_mean = _.unzip(d1.value);
+            var array_data_mean2 = [];
+            array_data_mean.forEach(d2 =>
+                array_data_mean2.push(math.mean(d2))
+            )
+            array_data_mean3.push({
+                "data": array_data_mean2,
+                "step": d1.step,
+                "noreport": d1.noreport,
+                "location": parseInt(d1.location),
+                "time_origin": timestep[d1.step]
+            })
+        })
+        array_data_mean_hour.push(array_data_mean3)
+
+    });
+    Update_heatmap(array_data_mean_hour,cellSize)
+
+}
+
+function Update_heatmap(data, cellSize) {
+
     // create tooltip
     tooltip = d3.select("#heatmap")
         .append("div")
@@ -177,12 +232,16 @@ function Update_heatmap(data, report_scale, colorScale) {
     // });
     // }
 
-    if (data[5].length < 200) {
-        cellSize = 6
-    } else if (data[5].length < 450) {
+    if (data[5].length < 122) {
+        cellSize = 8
+    }
+    // else if (data[5].length < 200){
+    //     cellSize = 8
+    // }
+    else if (data[5].length < 450) {
         cellSize = 5
     }
-    console.log(cellSize)
+    // console.log(cellSize)
 
 
     maing = svg_heatmap.selectAll('g').data(data).enter()
@@ -197,7 +256,7 @@ function Update_heatmap(data, report_scale, colorScale) {
         .data(rows => rows)
         .enter().append("g")
         .attr("class", "row")
-        .attr("transform", (row) => `translate(${(row.step-math.min(timestep)) * (cellSize)},0)`)
+        .attr("transform", (row) => `translate(${(row.step - math.min(timestep)) * (cellSize)},0)`)
         .attr("class", function (d, i) {
             return "column" + d.step;
         });
@@ -252,6 +311,8 @@ function Update_heatmap(data, report_scale, colorScale) {
         .enter().append("g")
         .attr("class", "legendElement");
 
+    var legendElementWidth = 10;
+
     legend.append("svg:rect")
         .attr("x", function (d, i) {
             return legendElementWidth * i;
@@ -259,7 +320,7 @@ function Update_heatmap(data, report_scale, colorScale) {
         .attr("y", 115)
         .attr("class", "cellLegend bordered")
         .attr("width", legendElementWidth)
-        .attr("height", cellSize / 2)
+        .attr("height", legendElementWidth / 4)
         .style("fill", function (d, i) {
             return colors[i];
 
@@ -267,7 +328,7 @@ function Update_heatmap(data, report_scale, colorScale) {
 
     legend.append("text")
         .attr("class", "mono legendElement")
-        .attr("font-size", "10px")
+        .attr("font-size", "8px")
         .text(function (d) {
             return "≥" + Math.round(d * 100) / 100;
         })
@@ -295,7 +356,7 @@ function Update_heatmap(data, report_scale, colorScale) {
         })
         .attr("x", 0)
         .attr("y", function (rowLabel, i) {
-            return i * ((cellSize+2) / 2);
+            return i * ((cellSize + 2) / 2);
         })
         .style("text-anchor", "middle")
         .style("font-size", "2px")
@@ -323,46 +384,67 @@ function initialize(i) {
 
 }
 
-function getDataByTime(dateStart, dateEnd) {
-    var data = [];
-    dataset.forEach(d => {
-        if (d.time >= dateStart && d.time <= dateEnd) {
-            data.push(d);
-        }
-    })
-    return data;
+function showdatabyfeature() {
+    var a=[0,1,2,3,4,5]
+    svg_heatmap.transition().duration(3000).selectAll(".cell")
+        .attr("y",
+            function (d) {
+                if(a.includes(d.type)) {
+
+                    return d.type*160-(d.location - 1) * 43;
+                }
+            });
+    var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
+    var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
+    // Add the y Axis
+    svg_heatmap.append("g").attr("class","label_axis")
+        .attr("transform", "translate(120," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return label[d]; }));
+    maing.selectAll("text").remove();
+    svg_heatmap.select(".y_axis").remove();
 }
 
-
-// Count the categories and return a descending frequency-ordered list of top categories
-function CountCategories(data) {    // ***We could optimize this function further, but maybe later
-    var categories = [];            // ***I think it has O(N^2) time complexity or more     ~Darien
-    var count_category = [];
-    var category_queue = [];
-    //(data) get from d3.csv, push all category to categories array
-    data.forEach(d => { // Build the list of category occurrences
-        categories.push(d.time_geo);
-    });
-
-    var count;
-    data.forEach((d) => {
-        count = 0;
-        if (!category_queue.includes(d.time_geo)) {    // If this category has not been counted
-            for (i = 0; i < categories.length; i++) {   // Count the occurrences of this category
-                if (categories[i] === d.time_geo) {
-                    count++;
-                }
-            }
-            category_queue.push(d.time);              // Mark this category as counted
-            count_category.push({time: d.time_geo, number: count})    // Add the count of this category
-        }
-    });
-
-    //sort count_category array
-    count_category.sort(function (a, b) {
-        return new Date(a.time_geo) - new Date(b.time_geo)
-    });
-
-    return count_category;
+function showdatabylocation() {
+    svg_heatmap.select(".label_axis").remove();
+    maing.selectAll("text").remove()
+    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
+    // Add the y Axis
+    svg_heatmap.append("g").attr("class","y_axis")
+        .attr("transform", "translate(100," + 100 + ")")
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
+    var cellSize=10;
+    rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
+        .attr("y", function (cell,i) {
+            return i * (cellSize+4) / 2;
+        })
+    var rowLabels = maing.append("g")
+        .attr("class", "rowLabels")
+        .selectAll(".rowLabel")
+        .data(rowLabelData)
+        .enter().append("text")
+        .text(function (rowLabel) {
+            return rowLabel
+        })
+        .attr("x", 0)
+        .attr("y", function (rowLabel, i) {
+            return (i*cellSize/1.4 );
+        })
+        .style("text-anchor", "middle")
+        .style("font-size", "5px")
+        .attr("transform", function (rowLabel) {
+            return `translate(-20, ${4})`;
+        })
+        .attr("class", "rowLabel mono")
+        .attr("id", function (rowLabel, i) {
+            return "rowLabel_" + i;
+        })
+        .on('mouseover', function (d, i) {
+            d3.select(this).style("font-size","10px").classed("hover", true);
+        })
+        .on('mouseout', function (d, i) {
+            d3.select(this).style("font-size","5px").classed("hover", false);
+        });
+    svg_heatmap.select(".label_axis").remove();
 }
 
