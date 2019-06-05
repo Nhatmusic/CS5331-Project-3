@@ -46,7 +46,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         timestep.push(d.key);
         time_step_origin.push(d.values[0].time);
     })
-    console.log(report_number)
+    // console.log(report_number)
     plot_line_v4(report_number, dataByTime)
 
     var dataByLocation = d3.nest().key(d => d.location).entries(rows);
@@ -114,15 +114,13 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
     });
 
     var cellSize = 3;
-    var viewerWidth = 5000,
-        viewerHeight = 2000,
-        viewerPosTop = 100,
-        viewerPosLeft = 150;
-    legendElementWidth = cellSize * 2;
+    var viewerWidth = 1900,
+        viewerHeight = 2000;
 
     svg_heatmap = d3.select("#heatmap").append("svg")
-        .attr("width", viewerWidth + 8)
-        .attr("height", viewerHeight);
+        .attr("width", viewerWidth)
+        .attr("height", viewerHeight)
+        .attr("transform",'translate(50,100)');
 
 
     colors = colorbrewer["YlOrRd"][9];
@@ -216,13 +214,17 @@ function Update_heatmap(data, cellSize) {
         .append("div")
         .style("position", "absolute")
         .style("visibility", "hidden");
+
+    //find maximum time step
+    // var max_timestep = Math.max.apply(Math, data.map(function (el) { return el.length }));
+    var max_timestep = d3.max(data.flat(), d => d.step)
+    console.log(max_timestep)
+    //find minimum time step
     var timestep = []
-    // data.forEach(function (d) {
-    //     d.forEach(function (d1) {
-    //         return timestep.push(d1.step)
-    //     })
-    // });
     timestep = d3.min(data.flat(), d => d.step)
+
+    cellSize = +svg_heatmap.attr("width")/(max_timestep-timestep);
+    console.log(cellSize+ "hehehe")
 
 
     // data.map(function (d) {
@@ -232,15 +234,15 @@ function Update_heatmap(data, cellSize) {
     // });
     // }
 
-    if (data[5].length < 122) {
-        cellSize = 8
-    }
-    // else if (data[5].length < 200){
+    // if (data[5].length < 122) {
     //     cellSize = 8
     // }
-    else if (data[5].length < 450) {
-        cellSize = 5
-    }
+    // // else if (data[5].length < 200){
+    // //     cellSize = 8
+    // // }
+    // else if (data[5].length < 450) {
+    //     cellSize = 5
+    // }
     // console.log(cellSize)
 
 

@@ -139,11 +139,11 @@ function filterGeoTimeRange(timeRange) {
     array_data_mean4.forEach(function(d) {
     return selectedHeatmap_data.push(d.filter(function(d1){ return timerangedata[0] <= d1.time && d1.time <= timerangedata[1];}))
 })
-    console.log("heatmapdata" + selectedHeatmap_data)
+    // console.log("heatmapdata" + selectedHeatmap_data)
     svg_heatmap.selectAll("g").remove();
     var cellSize = 4;
     Update_heatmap(selectedHeatmap_data,cellSize)
-    console.log(selectedGeoData)
+    // console.log(selectedGeoData)
     selectedGeoData=d3.nest().key(d=>d.location).entries(selectedGeoData)
     // selectedGeoData.columns = initialData.columns;
     geo_data=[];
@@ -256,7 +256,7 @@ function plot_line_v4(report,data) {
         let div = d3.select("#report_line").append("div").attr("opacity", 0);
 
         //Build the xAsis
-        var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left}, ${margin.top + height})`);
+        var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left+110}, ${margin.top + height})`);
         const xScale = d3.scaleTime().domain(d3.extent(data, function(d) { return d.values[0].time_geo; })).range([0, width]);
         const x2Scale = d3.scaleTime().domain(d3.extent(data, function(d) { return d.values[0].time_geo; })).range([0, width]);
         const xAxis = d3.axisBottom(xScale);
@@ -264,7 +264,7 @@ function plot_line_v4(report,data) {
         xAxisG.call(xAxis)
 
 
-        const yAxisG = svg.append('g').attr("transform", `translate(${margin.left}, ${margin.top})`);
+        const yAxisG = svg.append('g').attr("transform", `translate(${margin.left+110}, ${margin.top})`);
         const yScale = d3.scaleLinear().domain([0, math.max(report)]).range([height, 0]);
         const y2Scale = d3.scaleLinear().domain([0, math.max(report)]).range([height2, 0]);
         const yAxis = d3.axisLeft(yScale);
@@ -305,12 +305,12 @@ function plot_line_v4(report,data) {
     })
         .y(d => y2Scale(d.values.length));
 
-    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
+    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left+110}, ${margin.top})`);
     graph.append("path").datum(data).attr("class", "area").attr("d",area);
 
     var context = svg.append("g")
         .attr("class", "context")
-        .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+        .attr("transform", `translate(${margin2.left+110}, ${margin2.top})`)
 
 
     context.append("path")
@@ -332,7 +332,7 @@ function plot_line_v4(report,data) {
         .attr("class", "zoom")
         .attr("width", width)
         .attr("height", height)
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("transform", `translate(${margin.left+110}, ${margin.top})`)
         .call(zoom);
 
     function brushed() {
