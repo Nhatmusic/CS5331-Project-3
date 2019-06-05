@@ -115,12 +115,12 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
 
     var cellSize = 3;
     var viewerWidth = 1900,
-        viewerHeight = 2000;
+        viewerHeight = 3000;
 
     svg_heatmap = d3.select("#heatmap").append("svg")
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
-        .attr("transform",'translate(50,100)');
+        .attr("transform", 'translate(50,100)');
 
 
     colors = colorbrewer["YlOrRd"][9];
@@ -130,7 +130,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         .range(colors);
     rowLabelData = ["shake_intensity", "medical", "buidings", "power", "roads_bridges", "sewer_water"]
 
-    Update_heatmap(array_data_mean4,cellSize)
+    Update_heatmap(array_data_mean4, cellSize)
 
 
     d3.json("./Dataset/StHimark.geojson", function (err, geojson) {
@@ -141,6 +141,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
             drawMap(geojson.features, j)
             initialize(j);
         }
+        console.log(geojson)
     });
     // drawGeoSlider(timeRange);
 
@@ -148,6 +149,12 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
 
 
 });
+
+function updatebyminute() {
+    svg_heatmap.selectAll("g").remove();
+    Update_heatmap(array_data_mean4,10)
+
+}
 
 function updatebyhour() {
     svg_heatmap.selectAll("g").remove();
@@ -203,7 +210,7 @@ function updatebyhour() {
         array_data_mean_hour.push(array_data_mean3)
 
     });
-    Update_heatmap(array_data_mean_hour,cellSize)
+    Update_heatmap(array_data_mean_hour, cellSize)
 
 }
 
@@ -222,33 +229,10 @@ function Update_heatmap(data, cellSize) {
     //find minimum time step
     var timestep = []
     timestep = d3.min(data.flat(), d => d.step)
-
-    cellSize = +svg_heatmap.attr("width")/(max_timestep-timestep);
-    console.log(cellSize+ "hehehe")
-
-
-    // data.map(function (d) {
-    //     d.map(function (d1) {
-    //        return d1.step = d1.step - math.min(timestep);
-    //     })
-    // });
-    // }
-
-    // if (data[5].length < 122) {
-    //     cellSize = 8
-    // }
-    // // else if (data[5].length < 200){
-    // //     cellSize = 8
-    // // }
-    // else if (data[5].length < 450) {
-    //     cellSize = 5
-    // }
-    // console.log(cellSize)
-
-
+    cellSize = +svg_heatmap.attr("width") / (max_timestep - timestep);
     maing = svg_heatmap.selectAll('g').data(data).enter()
         .append("g")
-        .attr("transform", (song, i) => `translate(${150},${100 + i * 50})`)
+        .attr("transform", (song, i) => `translate(${150},${(50)+i*cellSize * 10})`)
         .attr("class", 'locationheatmap')
         .attr("id", function (d, i) {
             return "location" + i
@@ -298,22 +282,22 @@ function Update_heatmap(data, cellSize) {
             tooltip.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
-            d3.select(this).classed("hover", false);
+            // d3.select(this).classed("hover", false);
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 1350) + "px").style("left", (d3.event.pageX - 65) + "px");
+            tooltip.style("top", (d3.event.pageY - 1060) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
     var legend = svg_heatmap.append("g")
         .attr("class", "legend")
         .attr("transform",
-            "translate(100,-80)")
+            "translate(100,-100)")
         .selectAll(".legendElement")
         .data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         .enter().append("g")
         .attr("class", "legendElement");
 
-    var legendElementWidth = 10;
+    var legendElementWidth = 20;
 
     legend.append("svg:rect")
         .attr("x", function (d, i) {
@@ -340,10 +324,10 @@ function Update_heatmap(data, cellSize) {
         .attr("y", 130);
 
     var Location_label = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton']
-    var y = d3.scaleLinear().range([945, 0]).domain([19, 0]);
+    var y = d3.scaleLinear().range([cellSize*190, 0]).domain([19, 0]);
     // Add the y Axis
     svg_heatmap.append("g").attr("class", "y_axis")
-        .attr("transform", "translate(100," + 100 + ")")
+        .attr("transform", (song, i) => `translate(${100},${(50)+i*cellSize * 10})`)
         .call(d3.axisLeft(y).ticks(19).tickFormat(function (d) {
             return Location_label[d];
         }));
@@ -375,6 +359,7 @@ function Update_heatmap(data, cellSize) {
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size", "2px").classed("hover", false);
         });
+    cell_size_global =cellSize;
 }
 
 function initialize(i) {
@@ -387,38 +372,44 @@ function initialize(i) {
 }
 
 function showdatabyfeature() {
-    var a=[0,1,2,3,4,5]
+    maing.selectAll("text").remove();
+    svg_heatmap.select(".y_axis").remove();
+    var a = [0, 1, 2, 3, 4, 5]
     svg_heatmap.transition().duration(3000).selectAll(".cell")
         .attr("y",
             function (d) {
-                if(a.includes(d.type)) {
+                if (a.includes(d.type)) {
 
-                    return d.type*160-(d.location - 1) * 43;
+                    return d.type * cell_size_global*32 - ((d.location - 1) * cell_size_global*9);
                 }
             });
-    var label=["Shake_intensity","Medical","Buildings","Power","Roads&Bridges","Sewer&Water"]
-    var y = d3.scaleLinear().range([945, 0]).domain([6,0]);
+    var label = ["Shake_intensity", "Medical", "Buildings", "Power", "Roads&Bridges", "Sewer&Water"]
+    var y = d3.scaleLinear().range([cell_size_global*190, 0]).domain([6, 0]);
     // Add the y Axis
-    svg_heatmap.append("g").attr("class","label_axis")
-        .attr("transform", "translate(120," + 100 + ")")
-        .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return label[d]; }));
-    maing.selectAll("text").remove();
-    svg_heatmap.select(".y_axis").remove();
+    svg_heatmap.append("g").attr("class", "label_axis")
+        .attr("transform", (song, i) => `translate(${100},${(50)+i*cell_size_global * 10})`)
+        .call(d3.axisLeft(y).ticks(6).tickFormat(function (d) {
+            return label[d];
+        }));
+
 }
 
 function showdatabylocation() {
+    svg_heatmap.select(".y_axis").remove();
     svg_heatmap.select(".label_axis").remove();
     maing.selectAll("text").remove()
-    var Location_label=['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs','Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston','Southton','Oak Willow', 'East Parton', 'West Parton']
-    var y = d3.scaleLinear().range([945, 0]).domain([19,0]);
+    var Location_label = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton']
+    var y = d3.scaleLinear().range([945, 0]).domain([19, 0]);
     // Add the y Axis
-    svg_heatmap.append("g").attr("class","y_axis")
+    svg_heatmap.append("g").attr("class", "y_axis")
         .attr("transform", "translate(100," + 100 + ")")
-        .call(d3.axisLeft(y).ticks(19).tickFormat(function(d) { return Location_label[d]; }));
-    var cellSize=10;
+        .call(d3.axisLeft(y).ticks(19).tickFormat(function (d) {
+            return Location_label[d];
+        }));
+    var cellSize = 10;
     rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
-        .attr("y", function (cell,i) {
-            return i * (cellSize+4) / 2;
+        .attr("y", function (cell, i) {
+            return i * (cellSize + 4) / 2;
         })
     var rowLabels = maing.append("g")
         .attr("class", "rowLabels")
@@ -430,7 +421,7 @@ function showdatabylocation() {
         })
         .attr("x", 0)
         .attr("y", function (rowLabel, i) {
-            return (i*cellSize/1.4 );
+            return (i * cellSize / 1.4);
         })
         .style("text-anchor", "middle")
         .style("font-size", "5px")
@@ -442,10 +433,10 @@ function showdatabylocation() {
             return "rowLabel_" + i;
         })
         .on('mouseover', function (d, i) {
-            d3.select(this).style("font-size","10px").classed("hover", true);
+            d3.select(this).style("font-size", "10px").classed("hover", true);
         })
         .on('mouseout', function (d, i) {
-            d3.select(this).style("font-size","5px").classed("hover", false);
+            d3.select(this).style("font-size", "5px").classed("hover", false);
         });
     svg_heatmap.select(".label_axis").remove();
 }
