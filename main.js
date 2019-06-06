@@ -399,17 +399,17 @@ function showdatabylocation() {
     svg_heatmap.select(".label_axis").remove();
     maing.selectAll("text").remove()
     var Location_label = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton']
-    var y = d3.scaleLinear().range([945, 0]).domain([19, 0]);
+    var y = d3.scaleLinear().range([cell_size_global*190, 0]).domain([19, 0]);
     // Add the y Axis
     svg_heatmap.append("g").attr("class", "y_axis")
-        .attr("transform", "translate(100," + 100 + ")")
+        .attr("transform", (song, i) => `translate(${100},${(50)+i*cell_size_global * 10})`)
         .call(d3.axisLeft(y).ticks(19).tickFormat(function (d) {
             return Location_label[d];
         }));
-    var cellSize = 10;
+    // var cellSize = 10;
     rowss.transition().duration(3000).selectAll(".cell").attr("x", 0)
         .attr("y", function (cell, i) {
-            return i * (cellSize + 4) / 2;
+            return i * (cell_size_global + 4) / 2;
         })
     var rowLabels = maing.append("g")
         .attr("class", "rowLabels")
@@ -421,10 +421,10 @@ function showdatabylocation() {
         })
         .attr("x", 0)
         .attr("y", function (rowLabel, i) {
-            return (i * cellSize / 1.4);
+            return i * ((cell_size_global+4) / 2);
         })
         .style("text-anchor", "middle")
-        .style("font-size", "5px")
+        .style("font-size", "2px")
         .attr("transform", function (rowLabel) {
             return `translate(-20, ${4})`;
         })
@@ -436,8 +436,7 @@ function showdatabylocation() {
             d3.select(this).style("font-size", "10px").classed("hover", true);
         })
         .on('mouseout', function (d, i) {
-            d3.select(this).style("font-size", "5px").classed("hover", false);
+            d3.select(this).style("font-size", "2px").classed("hover", false);
         });
-    svg_heatmap.select(".label_axis").remove();
 }
 
