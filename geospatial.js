@@ -231,8 +231,8 @@ function plot_line_v4(report, data) {
             .attr("width", 1900)
             .attr("height", 200)
             .attr("transform", 'translate(80,-20)'),
-        margin = {top: 10, right: 20, bottom: 35, left: 40},
-        margin2 = {top: 165, right: 20, bottom: 15, left: 40},
+        margin = {top: 10, right: 20, bottom: 40, left: 40},
+        margin2 = {top: 165, right: 20, bottom: 20, left: 40},
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         height2 = +svg.attr("height") - margin2.top - margin2.bottom;
