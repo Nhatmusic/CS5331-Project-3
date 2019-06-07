@@ -230,14 +230,36 @@ function Update_heatmap(data, cellSize) {
     var timestep = []
     timestep = d3.min(data.flat(), d => d.step)
     cellSize = +svg_heatmap.attr("width") / (max_timestep - timestep);
+    if ((max_timestep - timestep) <= 121) {
+        var cellSize_scale = cellSize/2
+    }
+    else  if ((max_timestep - timestep) < 60) {
+        cellSize_scale = cellSize/8
+    }
+    else  if ((max_timestep - timestep) < 45) {
+        cellSize_scale = cellSize/32
+    }
+
+    else  if ((max_timestep - timestep) < 30) {
+        cellSize_scale = cellSize/120
+    }
+
+    else  if ((max_timestep - timestep) < 15) {
+        cellSize_scale = cellSize/240
+    }
+    else
+        {
+        cellSize_scale = cellSize;
+    }
     maing = svg_heatmap.selectAll('g').data(data).enter()
         .append("g")
-        .attr("transform", (song, i) => `translate(${150},${(50)+i*cellSize * 10})`)
+        .attr("transform", (song, i) => `translate(${150},${(50)+i*cellSize_scale * 10})`)
         .attr("class", 'locationheatmap')
         .attr("id", function (d, i) {
             return "location" + i
         })
     maing.exit().remove();
+
     rowss = maing.selectAll(".row")
         .data(rows => rows)
         .enter().append("g")
@@ -324,10 +346,12 @@ function Update_heatmap(data, cellSize) {
         .attr("y", 130);
 
     var Location_label = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'BroadView', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar Ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton']
-    var y = d3.scaleLinear().range([cellSize*190, 0]).domain([19, 0]);
+    var y = d3.scaleLinear().range([cellSize_scale*190, 0]).domain([19, 0]);
+
+
     // Add the y Axis
     svg_heatmap.append("g").attr("class", "y_axis")
-        .attr("transform", (song, i) => `translate(${100},${(50)+i*cellSize * 10})`)
+        .attr("transform", (song, i) => `translate(${100},${(50)+i*cellSize_scale * 10})`)
         .call(d3.axisLeft(y).ticks(19).tickFormat(function (d) {
             return Location_label[d];
         }));
@@ -359,7 +383,7 @@ function Update_heatmap(data, cellSize) {
         .on('mouseout', function (d, i) {
             d3.select(this).style("font-size", "2px").classed("hover", false);
         });
-    cell_size_global =cellSize;
+    cell_size_global =cellSize_scale;
 }
 
 function initialize(i) {
