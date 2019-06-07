@@ -230,7 +230,7 @@ function plot_line_v4(report, data) {
             .append("svg")
             .attr("width", 1900)
             .attr("height", 200)
-            .attr("transform", 'translate(30,-20)'),
+            .attr("transform", 'translate(110,-20)'),
         margin = {top: 10, right: 20, bottom: 40, left: 40},
         margin2 = {top: 165, right: 20, bottom: 20, left: 40},
         width = +svg.attr("width") - margin.left - margin.right,
@@ -252,7 +252,7 @@ function plot_line_v4(report, data) {
     let div = d3.select("#report_line").append("div").attr("opacity", 0);
 
     //Build the xAsis
-    var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left + 110}, ${margin.top + height})`);
+    var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left }, ${margin.top + height})`);
     const xScale = d3.scaleTime().domain(d3.extent(data, function (d) {
         return d.values[0].time_geo;
     })).range([0, width]);
@@ -264,7 +264,7 @@ function plot_line_v4(report, data) {
     xAxisG.call(xAxis)
 
 
-    const yAxisG = svg.append('g').attr("transform", `translate(${margin.left + 110}, ${margin.top})`);
+    const yAxisG = svg.append('g').attr("transform", `translate(${margin.left}, ${margin.top})`);
     const yScale = d3.scaleLinear().domain([0, math.max(report)]).range([height, 0]);
     const y2Scale = d3.scaleLinear().domain([0, math.max(report)]).range([height2, 0]);
     const yAxis = d3.axisLeft(yScale);
@@ -305,12 +305,12 @@ function plot_line_v4(report, data) {
     })
         .y(d => y2Scale(d.values.length));
 
-    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left + 110}, ${margin.top})`);
+    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
     graph.append("path").datum(data).attr("class", "area").attr("d", area);
 
     var context = svg.append("g")
         .attr("class", "context")
-        .attr("transform", `translate(${margin2.left + 110}, ${margin2.top})`)
+        .attr("transform", `translate(${margin2.left}, ${margin2.top})`)
 
 
     context.append("path")
@@ -332,7 +332,7 @@ function plot_line_v4(report, data) {
         .attr("class", "zoom")
         .attr("width", width)
         .attr("height", height)
-        .attr("transform", `translate(${margin.left + 110}, ${margin.top})`)
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
         .call(zoom);
 
     function brushed() {

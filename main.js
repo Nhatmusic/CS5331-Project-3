@@ -114,7 +114,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
     });
 
     var cellSize = 3;
-    var viewerWidth = 1900,
+    var viewerWidth = 2200,
         viewerHeight = 3000;
 
     svg_heatmap = d3.select("#heatmap").append("svg")
@@ -229,7 +229,7 @@ function Update_heatmap(data, cellSize) {
     //find minimum time step
     var timestep = []
     timestep = d3.min(data.flat(), d => d.step)
-    cellSize = +svg_heatmap.attr("width") / (max_timestep - timestep);
+    cellSize = 1840/ (max_timestep - timestep);
     if ((max_timestep - timestep) <= 121) {
         var cellSize_scale = cellSize/2
     }
@@ -308,7 +308,7 @@ function Update_heatmap(data, cellSize) {
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 1060) + "px").style("left", (d3.event.pageX - 65) + "px");
+            tooltip.style("top", (d3.event.pageY - 700) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
     var legend = svg_heatmap.append("g")
         .attr("class", "legend")
