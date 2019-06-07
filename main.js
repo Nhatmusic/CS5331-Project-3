@@ -120,7 +120,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
     svg_heatmap = d3.select("#heatmap").append("svg")
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
-        .attr("transform", 'translate(50,100)');
+        .attr("transform", 'translate(0,0)');
 
 
     colors = colorbrewer["YlOrRd"][9];
