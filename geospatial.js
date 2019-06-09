@@ -114,8 +114,10 @@ function filterGeoTimeRange(timeRange) {
     })
     // console.log("heatmapdata" + selectedHeatmap_data)
     svg_heatmap.selectAll("g").remove();
+    // svg_heatmap.selectAll('.reportheatmap').remove();
     var cellSize = 4;
     Update_heatmap(selectedHeatmap_data, cellSize)
+    // showdatabyreport(selectedHeatmap_data)
     // console.log(selectedGeoData)
     selectedGeoData = d3.nest().key(d => d.location).entries(selectedGeoData)
     // selectedGeoData.columns = initialData.columns;
@@ -224,20 +226,23 @@ groupGeo.append("svg:image")
 
 }
 
+//
+
+
+
 function plot_line_v4(report, data) {
 
     var svg = d3.select("#report_line")
             .append("svg")
             .attr("width", 1900)
             .attr("height", 200)
+            .attr("class","reportline")
             .attr("transform", 'translate(110,-20)'),
         margin = {top: 10, right: 20, bottom: 40, left: 40},
         margin2 = {top: 165, right: 20, bottom: 20, left: 40},
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         height2 = +svg.attr("height") - margin2.top - margin2.bottom;
-    // contentWidth = width - margin.left - margin.right,
-    // contentHeight = height - margin.top - margin.bottom;
 
 
     var clip = svg.append("defs").append("svg:clipPath")
@@ -248,12 +253,12 @@ function plot_line_v4(report, data) {
         .attr("x", 0)
         .attr("y", 0);
 
-    // //Build tooltip
-    let div = d3.select("#report_line").append("div").attr("opacity", 0);
+    // // //Build tooltip
+    // let div = d3.select("#report_line").append("div").attr("opacity", 0);
 
     //Build the xAsis
     var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left }, ${margin.top + height})`);
-    const xScale = d3.scaleTime().domain(d3.extent(data, function (d) {
+    xScale = d3.scaleTime().domain(d3.extent(data, function (d) {
         return d.values[0].time_geo;
     })).range([0, width]);
     const x2Scale = d3.scaleTime().domain(d3.extent(data, function (d) {
@@ -288,10 +293,10 @@ function plot_line_v4(report, data) {
         })
         .y0(height)
         .y1(d => yScale(d.values.length));
-    const lineGen = d3.line().x(function (d) {
-        return xScale(d.values[0].time_geo)
-    })
-        .y(d => yScale(d.values.length));
+    // const lineGen = d3.line().x(function (d) {
+    //     return xScale(d.values[0].time_geo)
+    // })
+    //     .y(d => yScale(d.values.length));
 
     const area2 = d3.area()
         .curve(d3.curveMonotoneX)
@@ -300,10 +305,10 @@ function plot_line_v4(report, data) {
         })
         .y0(height2)
         .y1(d => y2Scale(d.values.length));
-    const lineGen2 = d3.line().x(function (d) {
-        return x2Scale(d.values[0].time_geo)
-    })
-        .y(d => y2Scale(d.values.length));
+    // const lineGen2 = d3.line().x(function (d) {
+    //     return x2Scale(d.values[0].time_geo)
+    // })
+    //     .y(d => y2Scale(d.values.length));
 
     const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
     graph.append("path").datum(data).attr("class", "area").attr("d", area);

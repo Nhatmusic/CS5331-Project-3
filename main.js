@@ -18,7 +18,7 @@ const observeTime = d3.timeParse("%m/%d/%Y %H");
 // const parseTime = d3.timeParse("%m/%d/%Y %H:%M");
 // const formatTimeDay = d3.timeFormat("%d");
 
-d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
+d3.csv("./Dataset/data-optimized.csv", function (err, rows) {
     // console.log(rows);
 
     dataset = rows;
@@ -35,6 +35,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         return (element !== "location" &&
             element !== "time");
     });
+
     var time_step_origin = [];
     //nest data by time and sort data
     dataByTime = d3.nest().key(d => d.time_geo).entries(rows);
@@ -46,7 +47,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         timestep.push(d.key);
         time_step_origin.push(d.values[0].time);
     })
-    // console.log(report_number)
+  //draw area graph of report number
     plot_line_v4(report_number, dataByTime)
 
     var dataByLocation = d3.nest().key(d => d.location).entries(rows);
@@ -62,6 +63,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
 
     //get data of each location by time and sort
     dataByTime_Heatmap = d3.nest().key(d => d.location).key(d => d.time_geo).entries(rows);
+    dataByTime_Heatmap.sort((a,b)=>(a.key)-(b.key))
     dataByTime_Heatmap.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
     dataByTime_Heatmap.forEach(d => d.values.forEach(d => d.time_step = timestep.indexOf(d.key)));
     var array_data3 = [];
@@ -70,6 +72,7 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         d.values.forEach(d1 => {
             var array_data1 = [];
             d1.values.forEach(d2 => {
+
                 array_data1.push([+d2.shake_intensity, +d2.medical, +d2.buildings, +d2.power, +d2.roads_and_bridges, +d2.sewer_and_water])
             })
             array_data2.push({
@@ -123,10 +126,10 @@ d3.csv("./Dataset/mc1-reports-data.csv", function (err, rows) {
         .attr("transform", 'translate(0,0)');
 
 
-    colors = colorbrewer["YlOrRd"][9];
+    colors = ["#d3d3d3","#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"];
     //create color scale to display the feature
     colorScale = d3.scaleQuantize()
-        .domain([0, 10])
+        .domain([-1, 10])
         .range(colors);
     rowLabelData = ["shake_intensity", "medical", "buidings", "power", "roads_bridges", "sewer_water"]
 
@@ -165,6 +168,7 @@ function updatebyhour() {
     var timestep = [];
     //get data of each location by time and sort
     var dataByTime_Heatmap = d3.nest().key(d => d.location).key(d => d.time_heatmap).entries(dataset);
+    dataByTime_Heatmap.sort((a,b)=>(a.key)-(b.key));
     dataByTime_Heatmap.forEach(d => d.values.sort((a, b) => new Date(a.key) - new Date(b.key)));
     dataByTime_Heatmap[1].values.forEach(d => timestep.push(d.key))
     dataByTime_Heatmap.forEach(d => d.values.forEach(d => d.time_step = timestep.indexOf(d.key)));
@@ -188,7 +192,7 @@ function updatebyhour() {
     });
 
     var array_data_mean = [];
-    var array_data_mean_hour = [];
+    array_data_mean_hour = [];
 
     array_data3.forEach(d => {
         var array_data_mean3 = [];
@@ -258,7 +262,7 @@ function Update_heatmap(data, cellSize) {
         .attr("id", function (d, i) {
             return "location" + i
         })
-    maing.exit().remove();
+    // maing.exit().remove();
 
     rowss = maing.selectAll(".row")
         .data(rows => rows)
@@ -308,14 +312,14 @@ function Update_heatmap(data, cellSize) {
             tooltip.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip.style("top", (d3.event.pageY - 700) + "px").style("left", (d3.event.pageX - 65) + "px");
+            tooltip.style("top", (d3.event.pageY - 750) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
     var legend = svg_heatmap.append("g")
         .attr("class", "legend")
         .attr("transform",
             "translate(100,-100)")
         .selectAll(".legendElement")
-        .data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        .data([-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         .enter().append("g")
         .attr("class", "legendElement");
 
@@ -463,4 +467,52 @@ function showdatabylocation() {
             d3.select(this).style("font-size", "2px").classed("hover", false);
         });
 }
+
+function showdatabyreport(data){
+
+
+    maing_report = svg_heatmap.selectAll('.reportheatmap').data(data).enter()
+        .append("g")
+        .attr("transform", (song, i) => `translate(${150},${((i+4)*cell_size_global * 10)})`)
+        .attr("class", 'reportheatmap')
+        .attr("id", function (d, i) {
+            return "report" + i
+        })
+
+    // var clip_heat = maing_report.append("defs").append("svg:clipPath")
+    //     .attr("id", "clip_heat")
+    //     .append("svg:rect")
+    //     .attr("width", +svg_heatmap.attr("width"))
+    //     .attr("height", 10*cell_size_global)
+    //     .attr("x", 0)
+    //     .attr("y", 0);
+
+    yScale_report = d3.scaleLinear().domain([0, 4485]).range([cell_size_global * 5, 0]);
+    // // //Build tooltip
+    // let div = d3.select("#report_line").append("div").attr("opacity", 0);
+
+    //Build the xAsis
+    var xAxisG = maing_report.append("g").attr("class", "focus").attr("transform", `translate(${0}, ${8*cell_size_global})`);
+    // const xScale = d3.scaleTime().domain(d3.extent(selectedHeatmap_data.flat(), function (d) {
+    //     return d.time;
+    // })).range([0, 1840]);
+
+    const xAxis = d3.axisBottom(xScale);
+
+    xAxisG.call(xAxis.ticks(0))
+
+
+    const area = d3.area()
+        .curve(d3.curveMonotoneX)
+        .x(function (d) {
+            return xScale(d.time)
+        })
+        .y0(5*cell_size_global)
+        .y1(d => yScale_report(d.noreport));
+
+    graph_heat = maing_report.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${0}, ${3*cell_size_global})`);
+    graph_heat.append("path").datum(data=>data).attr("class", "area_heat").attr("d", area);
+
+}
+
 

@@ -80,8 +80,8 @@ svg {
     top: 350px;
     width:2200px;
     height: 260px;
-
 }
+
 #heatmap{
     /*float: left;*/
     /*border: 1px solid black;*/
@@ -393,6 +393,20 @@ text.hover {
     left: 700px;
     cursor: pointer;
 }
+#button5 {
+    background-color: #4CAF50; /* Green */
+    border: 2px solid gray;
+    color: white;
+    padding: 5px 60px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    font-size: 10px;
+    position: absolute;
+    top: 50px;
+    left: 900px;
+    cursor: pointer;
+}
 .grid {
     font-size: 8px;
 }
@@ -409,7 +423,13 @@ text.hover {
 #button4:hover {background-color: deepskyblue;
 }
 
+#button5:hover {background-color: deepskyblue;
+}
+
 .area{
+    fill: steelblue;
+}
+.area_heat{
     fill: steelblue;
 }
 .zoom {
