@@ -468,51 +468,206 @@ function showdatabylocation() {
         });
 }
 
-function showdatabyreport(data){
+// function showdatabyreport(data){
+//
+//
+//     maing_report = svg_heatmap.selectAll('.reportheatmap').data(data).enter()
+//         .append("g")
+//         .attr("transform", (song, i) => `translate(${150},${((i+4)*cell_size_global * 10)})`)
+//         .attr("class", 'reportheatmap')
+//         .attr("id", function (d, i) {
+//             return "report" + i
+//         })
+//
+//     // var clip_heat = maing_report.append("defs").append("svg:clipPath")
+//     //     .attr("id", "clip_heat")
+//     //     .append("svg:rect")
+//     //     .attr("width", +svg_heatmap.attr("width"))
+//     //     .attr("height", 10*cell_size_global)
+//     //     .attr("x", 0)
+//     //     .attr("y", 0);
+//
+//     yScale_report = d3.scaleLinear().domain([0, 4485]).range([cell_size_global * 5, 0]);
+//     // // //Build tooltip
+//     // let div = d3.select("#report_line").append("div").attr("opacity", 0);
+//
+//     //Build the xAsis
+//     var xAxisG = maing_report.append("g").attr("class", "focus").attr("transform", `translate(${0}, ${8*cell_size_global})`);
+//     // const xScale = d3.scaleTime().domain(d3.extent(selectedHeatmap_data.flat(), function (d) {
+//     //     return d.time;
+//     // })).range([0, 1840]);
+//
+//     const xAxis = d3.axisBottom(xScale);
+//
+//     xAxisG.call(xAxis.ticks(0))
+//
+//
+//     const area = d3.area()
+//         .curve(d3.curveMonotoneX)
+//         .x(function (d) {
+//             return xScale(d.time)
+//         })
+//         .y0(5*cell_size_global)
+//         .y1(d => yScale_report(d.noreport));
+//
+//     graph_heat = maing_report.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${0}, ${3*cell_size_global})`);
+//     graph_heat.append("path").datum(data=>data).attr("class", "area_heat").attr("d", area);
+//
+// }
+
+function plot_line_v4(report, data) {
+
+    var svg = d3.select("#report_line")
+            .append("svg")
+            .attr("width", 1900)
+            .attr("height", 200)
+            .attr("class","reportline")
+            .attr("transform", 'translate(110,-20)'),
+        margin = {top: 10, right: 20, bottom: 40, left: 40},
+        margin2 = {top: 165, right: 20, bottom: 20, left: 40},
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom,
+        height2 = +svg.attr("height") - margin2.top - margin2.bottom;
 
 
-    maing_report = svg_heatmap.selectAll('.reportheatmap').data(data).enter()
-        .append("g")
-        .attr("transform", (song, i) => `translate(${150},${((i+4)*cell_size_global * 10)})`)
-        .attr("class", 'reportheatmap')
-        .attr("id", function (d, i) {
-            return "report" + i
-        })
+    var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0);
 
-    // var clip_heat = maing_report.append("defs").append("svg:clipPath")
-    //     .attr("id", "clip_heat")
-    //     .append("svg:rect")
-    //     .attr("width", +svg_heatmap.attr("width"))
-    //     .attr("height", 10*cell_size_global)
-    //     .attr("x", 0)
-    //     .attr("y", 0);
-
-    yScale_report = d3.scaleLinear().domain([0, 4485]).range([cell_size_global * 5, 0]);
     // // //Build tooltip
     // let div = d3.select("#report_line").append("div").attr("opacity", 0);
 
     //Build the xAsis
-    var xAxisG = maing_report.append("g").attr("class", "focus").attr("transform", `translate(${0}, ${8*cell_size_global})`);
-    // const xScale = d3.scaleTime().domain(d3.extent(selectedHeatmap_data.flat(), function (d) {
-    //     return d.time;
-    // })).range([0, 1840]);
-
+    var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left }, ${margin.top + height})`);
+    xScale = d3.scaleTime().domain(d3.extent(data, function (d) {
+        return d.values[0].time_geo;
+    })).range([0, width]);
+    const x2Scale = d3.scaleTime().domain(d3.extent(data, function (d) {
+        return d.values[0].time_geo;
+    })).range([0, width]);
     const xAxis = d3.axisBottom(xScale);
+    const xAxis2 = d3.axisBottom(x2Scale);
+    xAxisG.call(xAxis)
 
-    xAxisG.call(xAxis.ticks(0))
+
+    const yAxisG = svg.append('g').attr("transform", `translate(${margin.left}, ${margin.top})`);
+    const yScale = d3.scaleLinear().domain([0, math.max(report)]).range([height, 0]);
+    const y2Scale = d3.scaleLinear().domain([0, math.max(report)]).range([height2, 0]);
+    const yAxis = d3.axisLeft(yScale);
+    yAxisG.call(yAxis);
+    var brush = d3.brushX()
+        .extent([[0, 0], [width, height2]])
+        .on("brush end", brushed);
+
+    var zoom = d3.zoom()
+        .scaleExtent([1, Infinity])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
+        .on("zoom", zoomed);
+    // .on("end", zoomend);
 
 
     const area = d3.area()
         .curve(d3.curveMonotoneX)
         .x(function (d) {
-            return xScale(d.time)
+            return xScale(d.values[0].time_geo)
         })
-        .y0(5*cell_size_global)
-        .y1(d => yScale_report(d.noreport));
+        .y0(height)
+        .y1(d => yScale(d.values.length));
+    // const lineGen = d3.line().x(function (d) {
+    //     return xScale(d.values[0].time_geo)
+    // })
+    //     .y(d => yScale(d.values.length));
 
-    graph_heat = maing_report.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${0}, ${3*cell_size_global})`);
-    graph_heat.append("path").datum(data=>data).attr("class", "area_heat").attr("d", area);
+    const area2 = d3.area()
+        .curve(d3.curveMonotoneX)
+        .x(function (d) {
+            return x2Scale(d.values[0].time_geo)
+        })
+        .y0(height2)
+        .y1(d => y2Scale(d.values.length));
+    // const lineGen2 = d3.line().x(function (d) {
+    //     return x2Scale(d.values[0].time_geo)
+    // })
+    //     .y(d => y2Scale(d.values.length));
+
+    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
+    graph.append("path").datum(data).attr("class", "area").attr("d", area);
+
+    var context = svg.append("g")
+        .attr("class", "context")
+        .attr("transform", `translate(${margin2.left}, ${margin2.top})`)
+
+
+    context.append("path")
+        .datum(data)
+        .attr("class", "area")
+        .attr("d", area2);
+
+    context.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height2 + ")")
+        .call(xAxis2);
+
+    context.append("g")
+        .attr("class", "brush")
+        .call(brush)
+        .call(brush.move, xScale.range());
+
+    svg.append("rect")
+        .attr("class", "zoom")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        .call(zoom);
+
+    function brushed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+        var s = d3.event.selection || x2Scale.range();
+        xScale.domain(s.map(x2Scale.invert, x2Scale));
+        graph.select(".area").attr("d", area);
+        xAxisG.call(xAxis);
+        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+            .scale(width / (s[1] - s[0]))
+            .translate(-s[0], 0));
+
+    }
+
+    function zoomed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        var t = d3.event.transform;
+        xScale.domain(t.rescaleX(x2Scale).domain());
+        graph.select(".area").attr("d", area);
+        xAxisG.call(xAxis);
+        context.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
+        var s = xScale.range().map(t.invertX, t)
+        timerangedata = s.map(x2Scale.invert)
+        filterGeoTimeRange(timerangedata)
+        console.log(timerangedata)
+    }
+
+    // let circles = graph.selectAll("circle").data(data).enter().append("circle").call(createCircle);
+    function createCircle(theCircle) {
+        return theCircle.attr("cx", function (d, i) {
+            return xScale(d.values[0].time_geo)
+        })
+            .attr("cy", d => yScale(d.values.length))
+            .attr("r", 0.5)
+            .style("fill", "black")
+            .on("mouseover", function (d, i) {
+                graph.style("display", null)
+                div.style('left', d3.event.pageX + "px").style("top", (d3.event.pageY - 1000) + "px");
+                div.style("opacity", 1);
+                div.html("Report Quantity: " + d.values.length + "</br>" + "Time: " + d.values[0].time_geo + "</br>");
+            })
+            .on("mouseout", d => {
+                graph.style("display", "none");
+                div.transition().style("opacity", 0);
+            });
+    }
 
 }
-
-

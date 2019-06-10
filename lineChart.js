@@ -77,7 +77,7 @@ d3.csv("Dataset/mc1-reports-data.csv",function (err, rows) {
         generateLocationSvg(lineChart,loc);
     });
 
-    initialize();
+    // initialize();
 
 });
 

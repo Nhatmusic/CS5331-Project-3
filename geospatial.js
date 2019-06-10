@@ -43,16 +43,18 @@ const BIGER_STROKE_WIDTH = 3;
 var geoWidth = 400;
 var geoHeight = 200;
 
-var GeoColor = colorbrewer["YlOrRd"][9];
-var colorScale = d3.scaleQuantize()
-    .domain([0, 10])
-    .range(GeoColor);
+// var GeoColor = colorbrewer["YlOrRd"][9];
+// var colorScale = d3.scaleQuantize()
+//     .domain([0, 10])
+//     .range(GeoColor);
 
 var projection = d3.geoMercator().center([-119.78, 0.15]).scale(120000);
 // var projection = d3.geoAlbers().center([-119,0]);
 var geopath = d3.geoPath().projection(projection);
 var averageLocationDamageObj;
 var averageLocationDamage;
+var reportno = {};
+var max_report=[];
 var locationList;
 var featuresGeo;
 var type_feature = ['shake_intensity', 'sewer_and_water', 'power', 'roads_and_bridges', 'medical', 'buildings']
@@ -60,6 +62,8 @@ var geo_data = [];
 
 // Format the data by location and analyze the damage for each location
 function analyzeDataByLocation(data, feature_id) {
+
+
 
     // Clear the data each time this is called
     averageLocationDamageObj = {};
@@ -82,21 +86,24 @@ function analyzeDataByLocation(data, feature_id) {
         let featureDamage = [];
         location.values.forEach(d => {
             featuresGeo.forEach((feature) => {
-                if (feature !== "location")
+                if (feature !== "location"&&feature !== "reportID")
                     if (!featureDamage.hasOwnProperty(feature)) {
                         featureDamage[feature] = 0;
                     }
                 featureDamage[feature] += +d[feature];
             })
         });
-
+        reportno[location.key] = location.values.length;
+        max_report.push(location.values.length)
         locationList.push(location.key);
         averageLocationDamageObj[location.key] = featureDamage[type_feature[feature_id]] / location.values.length;
 
 
     });
+
+
     console.log("after")
-    geo_data.push({averageLocationDamageObj: averageLocationDamageObj})
+    geo_data.push({averageLocationDamageObj: averageLocationDamageObj, reportnumber: reportno})
 }
 
 
@@ -105,6 +112,8 @@ function filterGeoTimeRange(timeRange) {
     var selectedGeoData = dataset.filter(function (d) {
         return timeRange[0] <= d.time_geo && d.time_geo <= timeRange[1];
     });
+    selectedGeoData = d3.nest().key(d => d.location).entries(selectedGeoData)
+    console.log(selectedGeoData)
 
     selectedHeatmap_data = [];
     array_data_mean4.forEach(function (d) {
@@ -112,14 +121,11 @@ function filterGeoTimeRange(timeRange) {
             return timerangedata[0] <= d1.time && d1.time <= timerangedata[1];
         }))
     })
-    // console.log("heatmapdata" + selectedHeatmap_data)
     svg_heatmap.selectAll("g").remove();
-    // svg_heatmap.selectAll('.reportheatmap').remove();
     var cellSize = 4;
     Update_heatmap(selectedHeatmap_data, cellSize)
-    // showdatabyreport(selectedHeatmap_data)
-    // console.log(selectedGeoData)
-    selectedGeoData = d3.nest().key(d => d.location).entries(selectedGeoData)
+
+    console.log(selectedGeoData)
     // selectedGeoData.columns = initialData.columns;
     geo_data = [];
     for (var i = 0; i < 6; i++) {
@@ -137,7 +143,16 @@ function updateGeoFill(i) {
         d3.select("#geo" + i + location).attr("fill", function () {
             return colorScale(geo_data[i].averageLocationDamageObj[+location])
         })
+
     });
+
+    // for (var i=0; i <6; i++) {
+    //     for (var j=1; j < 20; j++) {
+    //         groupGeo.selectAll("geo"+i+j).attr("stroke-width", function (d) {
+    //             return report_scale(geo_data[i].reportnumber[j])
+    //         })
+    //     }
+    // }
 
 }
 
@@ -146,13 +161,15 @@ function updateGeoFill(i) {
 function drawMap(geojsonFeatures, feature_id) {
     var svgGeo = d3.select(".geospatial" + feature_id).append("svg").attr("width", geoWidth).attr("height", geoHeight)
         .attr('viewBox', "0 0 700 600");
-    var groupGeo = svgGeo.append("g").attr("transform", "translate(30,10)");
+    groupGeo = svgGeo.append("g").attr("transform", "translate(30,10)");
     // create tooltip
     var tooltip_geo = d3.select("#row")
         .append("div")
         .style("position", "absolute")
         .style("visibility", "hidden");
 
+    //scale the number of report to [0,1];
+   report_scale_geo = d3.scaleLinear().domain([math.min(max_report), math.max(max_report)]).range([0.5, 6]);
     //Draw Map
     groupGeo.selectAll("path").data(geojsonFeatures)
         .enter()
@@ -164,8 +181,12 @@ function drawMap(geojsonFeatures, feature_id) {
         })
         .attr("fill-opacity", GEO_OPACITY_DEFAULT)
         .attr("stroke", "#222")
+        .attr("stroke-width",function(d) {
+            return report_scale_geo(geo_data[feature_id].reportnumber[d.properties.Id.toString()])
+        })
         .on('mouseover', function (d) {
-            tooltip_geo.html('<div class="heatmap_tooltip">' + "Location: " + d.properties.Nbrhood + "<br/>" + "Damage Level: " + (geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()]).toFixed(2) + "<br/>" + '</div>');
+            tooltip_geo.html('<div class="heatmap_tooltip">' + "Location: " + d.properties.Nbrhood + "<br/>" + "Damage Level: " + (geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()]).toFixed(2) + "<br/>" +
+                "Report Quantity: " + (geo_data[feature_id].reportnumber[d.properties.Id.toString()]) + "<br/>" +'</div>');
             tooltip_geo.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
@@ -175,15 +196,6 @@ function drawMap(geojsonFeatures, feature_id) {
         .on("mousemove", function (cell) {
             tooltip_geo.style("top", (d3.event.pageY - 200) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
-
-
-    // Draw hospital
-    // groupGeo.selectAll("geoHospitals").data(hospitals)
-    //     .enter()
-    //     .append("circle")
-    //     .attr("class", "geoHospitals")
-    //     .attr("cx", d => projection(d.position)[0])
-    //     .attr("cy", d => projection(d.position)[1]);
     groupGeo.selectAll("geoHospitals").data(hospitals)
         .enter()
     .append("svg:image")
@@ -230,160 +242,4 @@ groupGeo.append("svg:image")
 
 
 
-function plot_line_v4(report, data) {
-
-    var svg = d3.select("#report_line")
-            .append("svg")
-            .attr("width", 1900)
-            .attr("height", 200)
-            .attr("class","reportline")
-            .attr("transform", 'translate(110,-20)'),
-        margin = {top: 10, right: 20, bottom: 40, left: 40},
-        margin2 = {top: 165, right: 20, bottom: 20, left: 40},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom,
-        height2 = +svg.attr("height") - margin2.top - margin2.bottom;
-
-
-    var clip = svg.append("defs").append("svg:clipPath")
-        .attr("id", "clip")
-        .append("svg:rect")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("x", 0)
-        .attr("y", 0);
-
-    // // //Build tooltip
-    // let div = d3.select("#report_line").append("div").attr("opacity", 0);
-
-    //Build the xAsis
-    var xAxisG = svg.append("g").attr("class", "focus").attr("transform", `translate(${margin.left }, ${margin.top + height})`);
-    xScale = d3.scaleTime().domain(d3.extent(data, function (d) {
-        return d.values[0].time_geo;
-    })).range([0, width]);
-    const x2Scale = d3.scaleTime().domain(d3.extent(data, function (d) {
-        return d.values[0].time_geo;
-    })).range([0, width]);
-    const xAxis = d3.axisBottom(xScale);
-    const xAxis2 = d3.axisBottom(x2Scale);
-    xAxisG.call(xAxis)
-
-
-    const yAxisG = svg.append('g').attr("transform", `translate(${margin.left}, ${margin.top})`);
-    const yScale = d3.scaleLinear().domain([0, math.max(report)]).range([height, 0]);
-    const y2Scale = d3.scaleLinear().domain([0, math.max(report)]).range([height2, 0]);
-    const yAxis = d3.axisLeft(yScale);
-    yAxisG.call(yAxis);
-    var brush = d3.brushX()
-        .extent([[0, 0], [width, height2]])
-        .on("brush end", brushed);
-
-    var zoom = d3.zoom()
-        .scaleExtent([1, Infinity])
-        .translateExtent([[0, 0], [width, height]])
-        .extent([[0, 0], [width, height]])
-        .on("zoom", zoomed);
-    // .on("end", zoomend);
-
-
-    const area = d3.area()
-        .curve(d3.curveMonotoneX)
-        .x(function (d) {
-            return xScale(d.values[0].time_geo)
-        })
-        .y0(height)
-        .y1(d => yScale(d.values.length));
-    // const lineGen = d3.line().x(function (d) {
-    //     return xScale(d.values[0].time_geo)
-    // })
-    //     .y(d => yScale(d.values.length));
-
-    const area2 = d3.area()
-        .curve(d3.curveMonotoneX)
-        .x(function (d) {
-            return x2Scale(d.values[0].time_geo)
-        })
-        .y0(height2)
-        .y1(d => y2Scale(d.values.length));
-    // const lineGen2 = d3.line().x(function (d) {
-    //     return x2Scale(d.values[0].time_geo)
-    // })
-    //     .y(d => y2Scale(d.values.length));
-
-    const graph = svg.append("g").attr("clip-path", "url(#clip)").attr("transform", `translate(${margin.left}, ${margin.top})`);
-    graph.append("path").datum(data).attr("class", "area").attr("d", area);
-
-    var context = svg.append("g")
-        .attr("class", "context")
-        .attr("transform", `translate(${margin2.left}, ${margin2.top})`)
-
-
-    context.append("path")
-        .datum(data)
-        .attr("class", "area")
-        .attr("d", area2);
-
-    context.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height2 + ")")
-        .call(xAxis2);
-
-    context.append("g")
-        .attr("class", "brush")
-        .call(brush)
-        .call(brush.move, xScale.range());
-
-    svg.append("rect")
-        .attr("class", "zoom")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
-        .call(zoom);
-
-    function brushed() {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
-        var s = d3.event.selection || x2Scale.range();
-        xScale.domain(s.map(x2Scale.invert, x2Scale));
-        graph.select(".area").attr("d", area);
-        xAxisG.call(xAxis);
-        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
-            .scale(width / (s[1] - s[0]))
-            .translate(-s[0], 0));
-
-    }
-
-    function zoomed() {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
-        var t = d3.event.transform;
-        xScale.domain(t.rescaleX(x2Scale).domain());
-        graph.select(".area").attr("d", area);
-        xAxisG.call(xAxis);
-        context.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
-        var s = xScale.range().map(t.invertX, t)
-        timerangedata = s.map(x2Scale.invert)
-        filterGeoTimeRange(timerangedata)
-        console.log(timerangedata)
-    }
-
-    // let circles = graph.selectAll("circle").data(data).enter().append("circle").call(createCircle);
-    function createCircle(theCircle) {
-        return theCircle.attr("cx", function (d, i) {
-            return xScale(d.values[0].time_geo)
-        })
-            .attr("cy", d => yScale(d.values.length))
-            .attr("r", 0.5)
-            .style("fill", "black")
-            .on("mouseover", function (d, i) {
-                graph.style("display", null)
-                div.style('left', d3.event.pageX + "px").style("top", (d3.event.pageY - 1000) + "px");
-                div.style("opacity", 1);
-                div.html("Report Quantity: " + d.values.length + "</br>" + "Time: " + d.values[0].time_geo + "</br>");
-            })
-            .on("mouseout", d => {
-                graph.style("display", "none");
-                div.transition().style("opacity", 0);
-            });
-    }
-
-}
 
