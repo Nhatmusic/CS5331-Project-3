@@ -3,79 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Mini Challenge 1 Visualization</title>
-    <link rel="stylesheet" type="text/css" href="CSS/parallel.css">
+    <link rel="stylesheet" type="text/css" href="CSS/style.css">
     <link rel="stylesheet" type="text/css" href="CSS/line-graph.css">
-    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
-    <script src="https://d3js.org/d3-color.v1.min.js"></script>
-    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="./js/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-array.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
-    <script src="./js/colorbrewer.v1.min.js"></script>
-    <script src="./js/math.min.js"></script>
-    <script src="./js/underscore.js"></script>
-    <script src="./js/d3-legend.min.js"></script>
+    <script src="./lib/jquery-3.4.0.min.js"></script>
+    <script src="./lib/d3.v4.min.js"></script>
+    <!--<script src="https://d3js.org/d3-array.v1.min.js"></script>-->
+    <script src="./lib/d3-geo.v1.min.js"></script>
+    <script src="./lib/colorbrewer.v1.min.js"></script>
+    <script src="./lib/math.min.js"></script>
+    <script src="./lib/underscore.js"></script>
+    <!--<script src="./js/lodash.js"></script>-->
+
 </head>
 <body>
-    <div class="header">
-         Mini Challenge 1 Visualization
-    </div>
-    <br><br>
-    <!--<div class="filter">-->
-        <!--<label>Select Data Filter</br></label>-->
-        <!--<input type="radio" name="chooseGraph" id="timeSpan" checked>By Date<br>-->
-        <!--<input type="radio" name="chooseGraph" id="category"> By Location<br>-->
 
-        <!--<input type="submit" value="Choose" onclick="chooseOption()">-->
-        <!--<input type="submit" value="Reset" onclick="resetAll()">-->
-    <!--</div>-->
-
-    <!--<div>-->
-        <!--<form><label for="time-value-1" id="date-value-1"></label><input type="time" name="timeValue1" id="time-value-1" onchange="changeTime()"></form>-->
-        <!-- - <form><label for="time-value-2" id="date-value-2"></label><input type="time" name="timeValue2" id="time-value-2" onchange="changeTime()"></form>-->
-
-        <!--<div class="col-sm-2"><p id="value-simple"></p></div>-->
-        <!--<div class="col-sm"><div id="slider-simple"></div></div>-->
-    <!--</div>-->
-
-    <!--<div id="slider">-->
-        <!--<div class="col-sm-1">-->
-            <!--<div id="slider-time"></div>-->
-
-        <!--</div>-->
-    <!--</div>-->
-    <!--<br>-->
-    <!--<div class="categoryContainer">-->
-        <!--<div id="categoryContainer"style="overflow-y:scroll; width:200px; height:100px;"></div>-->
-    <!--</div>-->
-    <!--<div id="legend-chart"></div>-->
-    
-    <!--<div class="row">-->
-        <!--<div class="column">-->
-            <!--<div id="chart-area" >-->
-                <!--<h1>Parallel Coordinate Graph</h1>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
     <div id="row">
         <div class="geospatial0">
             <h2>Shake Intensity</h2>
         </div>
         <div class="geospatial1">
-            <h2>Sewer and water</h2>
-        </div>
-        <div class="geospatial2">
-            <h2>Power</h2>
-        </div>
-        <div class="geospatial3">
-            <h2>Roads and bridges</h2>
-        </div>
-        <div class="geospatial4">
             <h2>Medical</h2>
         </div>
-        <div class="geospatial5">
+        <div class="geospatial2">
             <h2>Buildings</h2>
+        </div>
+        <div class="geospatial3">
+            <h2>Power</h2>
+        </div>
+        <div class="geospatial4">
+            <h2>Roads and bridges</h2>
+        </div>
+        <div class="geospatial5">
+            <h2>Sewer&Water</h2>
         </div>
 
     </div>
@@ -96,13 +55,13 @@
 
 
     <div id="controller"></div>
-    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>-->
     <!--<script src="https://unpkg.com/d3-simple-slider"></script>-->
     <!--<script src="slider.js" ></script>-->
     <!--<script src="heatmap.js" ></script>-->
-    <script src="geospatial.js" ></script>
-    <script src="lineChart.js"></script>
+    <script src="./js/geospatial.js" ></script>
+    <!--<script src="lineChart.js"></script>-->
     <!--<script src="parallel.js"></script>-->
-    <script src="main.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>

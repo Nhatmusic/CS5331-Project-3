@@ -9,69 +9,69 @@ svg {
 }
 #row{
     position:absolute;
-    top: 50px;
+    top: 0px;
     width:1900px;
     height:300px;
 }
 .geospatial0 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
-    height:410px;
+    /*width:300px;*/
+    /*height:410px;*/
 }
 .geospatial1 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
+    /*width:0px;*/
     height:410px;
 }
 .geospatial2 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
-    height:410px;
+    /*width:300px;*/
+    /*height:410px;*/
 }
 .geospatial3 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
-    height:410px;
+    /*width:300px;*/
+    /*height:410px;*/
 }
 .geospatial4 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
-    height:410px;
+    /*width:300px;*/
+    /*height:410px;*/
 }
 .geospatial5 {
     float: left;
-    top: 50px;
+    top: 0px;
     position:relative;
     /*border: 1px solid black;*/
     /*left: 10px;*/
     /*position:absolute;*/
-    width:300px;
-    height:410px;
+    /*width:300px;*/
+    /*height:410px;*/
 }
 #report_line{
     /*float: left;*/
@@ -201,12 +201,14 @@ h1 {
     font-family: 'Dancing Script', cursive;
     font-size: 20px;
     text-align: center;
+
 }
 
 h2 {
     font-family: 'Dancing Script', cursive;
     font-size: 20px;
     text-align: center;
+    /*transform: rotate(90deg);*/
 }
 
 h3 {
@@ -217,7 +219,8 @@ h3 {
 h4 {
     font-family: 'Dancing Script', cursive;
     font-size: 20px;
-    text-align: center;
+    text-align: left;
+
 }
 
 
@@ -427,7 +430,7 @@ text.hover {
 }
 
 .area{
-    fill: steelblue;
+    fill: grey;
 }
 .area_heat{
     fill: steelblue;

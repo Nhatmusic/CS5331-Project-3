@@ -1,5 +1,4 @@
-// drawGeoSlider();
-// Hospital list
+// Harcoded position of hospital and nuclear plant
 var hospitals = [
     {name: 1, position: [-119.959400, 0.180960]},
     {name: 2, position: [-119.915900, 0.153120]},
@@ -32,91 +31,80 @@ var neighborHood = [
     {name: "18 - EAST PARTON", position: [-119.843400, 0.117060]},
     {name: "19 - WEST PARTON", position: [-119.876400, 0.106060]}];
 
-var checkedNeighborhood = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
-
 const GEO_OPACITY_DEFAULT = 0.3;
 const GEO_OPACITY_HOVER = 0.7;
 
-const NORMAL_STROKE_WIDTH = 1;
-const BIGER_STROKE_WIDTH = 3;
-
-var geoWidth = 400;
+//define svg size of each geo graph
+var geoWidth = 300;
 var geoHeight = 200;
-
-// var GeoColor = colorbrewer["YlOrRd"][9];
-// var colorScale = d3.scaleQuantize()
-//     .domain([0, 10])
-//     .range(GeoColor);
-
+//Draw Geomap using geodata
 var projection = d3.geoMercator().center([-119.78, 0.15]).scale(120000);
-// var projection = d3.geoAlbers().center([-119,0]);
 var geopath = d3.geoPath().projection(projection);
-var averageLocationDamageObj;
-var averageLocationDamage;
-var reportno = {};
-var max_report=[];
-var locationList;
-var featuresGeo;
-var type_feature = ['shake_intensity', 'sewer_and_water', 'power', 'roads_and_bridges', 'medical', 'buildings']
-var geo_data = [];
-
-// Format the data by location and analyze the damage for each location
-function analyzeDataByLocation(data, feature_id) {
 
 
 
-    // Clear the data each time this is called
-    averageLocationDamageObj = {};
-    averageLocationDamage = [];
-    locationList = [];
-    featuresGeo = [];
 
-    // Get columns of data
-    // featuresGeo = data.columns.slice(1,8);
-    featuresGeo = dataset.columns.filter(d => d !== "time");
-
-    // nest data by location
-    // update boxplot
-
-
-    console.log("before")
-
-    // Calculate total/average damage for each location
-    data.forEach(location => {
-        let featureDamage = [];
-        location.values.forEach(d => {
-            featuresGeo.forEach((feature) => {
-                if (feature !== "location"&&feature !== "reportID")
-                    if (!featureDamage.hasOwnProperty(feature)) {
-                        featureDamage[feature] = 0;
-                    }
-                featureDamage[feature] += +d[feature];
+function analyzed_geo_data(data) {
+    var temp_data_array = [];
+    temp_data_array = d3.nest().key(d => d.location).entries(data);
+    const reducer_geo = (accumulator, currentValue) => accumulator + currentValue;
+    temp_data_array.forEach(d => {
+        let temp_value = [];
+        let temp_data = [];
+        d.values.forEach(d1 => {
+            // d1.values.forEach(d2 => {
+            temp_value.push(d1.noreport);
+            temp_data.push(d1.data);
+            // })
+        })
+            var collect_value_data  = _.unzip(temp_data);
+            var collect_report_data = _.unzip(temp_value);
+            // console.log(collect_report_data)
+            var report=[];
+            collect_report_data.forEach( d3 => {
+                report.push(d3.reduce(reducer_geo));
             })
-        });
-        reportno[location.key] = location.values.length;
-        max_report.push(location.values.length)
-        locationList.push(location.key);
-        averageLocationDamageObj[location.key] = featureDamage[type_feature[feature_id]] / location.values.length;
 
+            var get_mean = [];
+            collect_value_data.forEach( (d,i) => {
+                var sum = 0;
+                for (var j = 0; j < collect_report_data[0].length; j++) {
+                    sum += d[j]*collect_report_data[i][j]
+                }
+                get_mean.push(sum)
+
+            })
+            d.value = get_mean.map(function(n, i) {
+                if (report[i] != 0) {
+                    return n / report[i];
+                }
+                else{
+                    return n = -1;
+                }
+            });
+            d.noreport = report;
 
     });
 
+    return temp_data_array;
 
-    console.log("after")
-    geo_data.push({averageLocationDamageObj: averageLocationDamageObj, reportnumber: reportno})
 }
 
 
 function filterGeoTimeRange(timeRange) {
-
-    var selectedGeoData = dataset.filter(function (d) {
-        return timeRange[0] <= d.time_geo && d.time_geo <= timeRange[1];
+    console.log("to5")
+    var selectedGeoData = array_data_total.flat().filter(function (d) {
+        return timeRange[0] <= d.time && d.time <= timeRange[1];
     });
-    selectedGeoData = d3.nest().key(d => d.location).entries(selectedGeoData)
-    console.log(selectedGeoData)
+    var geo_data = analyzed_geo_data(selectedGeoData)
+    // console.log(selectedGeoData)
+    for (var i=0; i<6; i++)
+    {
+        updateGeoFill(i,geo_data)
+    }
 
-    selectedHeatmap_data = [];
-    array_data_mean4.forEach(function (d) {
+    var selectedHeatmap_data = [];
+    array_data_total.forEach(function (d) {
         return selectedHeatmap_data.push(d.filter(function (d1) {
             return timerangedata[0] <= d1.time && d1.time <= timerangedata[1];
         }))
@@ -125,51 +113,61 @@ function filterGeoTimeRange(timeRange) {
     var cellSize = 4;
     Update_heatmap(selectedHeatmap_data, cellSize)
 
-    console.log(selectedGeoData)
-    // selectedGeoData.columns = initialData.columns;
-    geo_data = [];
-    for (var i = 0; i < 6; i++) {
-        analyzeDataByLocation(selectedGeoData, i);
-        updateGeoFill(i);
-    }
-
+    console.log("to6")
 }
 
+function updateGeoFill(i,geo_data) {
+    for (var location =1; location < 20; location ++) {
 
-
-function updateGeoFill(i) {
-
-    locationList.forEach(function (location) {
         d3.select("#geo" + i + location).attr("fill", function () {
-            return colorScale(geo_data[i].averageLocationDamageObj[+location])
+            if ((geo_data[location-1].value)[i] < 0){
+                return "white"
+            }
+            else {
+                return colorScale((geo_data[location - 1].value)[i])
+            }
         })
+            .attr("stroke-width", function () {
+                return report_scale((geo_data[location-1].noreport)[i])
+            })
+            .on('mouseover', function (d) {
+                tooltip_geo.html('<div class="heatmap_tooltip">' + "Location: " + d.properties.Nbrhood + "<br/>" + "Damage Level: " + (geo_data[d.properties.Id-1].value)[i].toFixed(2) + "<br/>" +
+                    "Report Quantity: " + ((geo_data[d.properties.Id -1]).noreport[i]) + "<br/>" +'</div>');
+                tooltip_geo.style("visibility", "visible");
+            })
+            // .on('mouseout', function (cell) {
+            //     // d3.select(this).classed("hover", false);
+            //     tooltip_geo.style("visibility", "hidden");
+            // })
+            // .on("mousemove", function (cell) {
+            //     tooltip_geo.style("top", (d3.event.pageY - 100) + "px").style("left", (d3.event.pageX - 65) + "px");
+            // });
 
-    });
 
-    // for (var i=0; i <6; i++) {
-    //     for (var j=1; j < 20; j++) {
-    //         groupGeo.selectAll("geo"+i+j).attr("stroke-width", function (d) {
-    //             return report_scale(geo_data[i].reportnumber[j])
-    //         })
-    //     }
-    // }
+    }
+
+
+
+
+
 
 }
 
 
 // Draw the geospatial diagram
-function drawMap(geojsonFeatures, feature_id) {
+function drawMap(geojsonFeatures, feature_id,geo_data) {
     var svgGeo = d3.select(".geospatial" + feature_id).append("svg").attr("width", geoWidth).attr("height", geoHeight)
         .attr('viewBox', "0 0 700 600");
     groupGeo = svgGeo.append("g").attr("transform", "translate(30,10)");
     // create tooltip
-    var tooltip_geo = d3.select("#row")
+    tooltip_geo = d3.select("#row")
         .append("div")
         .style("position", "absolute")
         .style("visibility", "hidden");
-
-    //scale the number of report to [0,1];
-   report_scale_geo = d3.scaleLinear().domain([math.min(max_report), math.max(max_report)]).range([0.5, 6]);
+    var store_report = [];
+    geo_data.forEach(d=> store_report.push(d.noreport))
+    //scale the number of report to [0,5,6]; for stroke-width of geo graph
+    report_scale_geo = d3.scaleLinear().domain([math.min(store_report), math.max(store_report)]).range([0.5, 6]);
     //Draw Map
     groupGeo.selectAll("path").data(geojsonFeatures)
         .enter()
@@ -177,16 +175,21 @@ function drawMap(geojsonFeatures, feature_id) {
         .attr("id", d => "geo" + feature_id + d.properties.Id)
         // .data(geojson)
         .attr("fill", d => {
-            return colorScale(geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()])
+            if ((geo_data[d.properties.Id-1].value)[feature_id]<0){
+                return "white"
+            }
+            else {
+                return colorScale((geo_data[d.properties.Id - 1].value)[feature_id])
+            }
         })
         .attr("fill-opacity", GEO_OPACITY_DEFAULT)
         .attr("stroke", "#222")
         .attr("stroke-width",function(d) {
-            return report_scale_geo(geo_data[feature_id].reportnumber[d.properties.Id.toString()])
+            return report_scale_geo((geo_data[d.properties.Id-1].noreport)[feature_id])
         })
         .on('mouseover', function (d) {
-            tooltip_geo.html('<div class="heatmap_tooltip">' + "Location: " + d.properties.Nbrhood + "<br/>" + "Damage Level: " + (geo_data[feature_id].averageLocationDamageObj[d.properties.Id.toString()]).toFixed(2) + "<br/>" +
-                "Report Quantity: " + (geo_data[feature_id].reportnumber[d.properties.Id.toString()]) + "<br/>" +'</div>');
+            tooltip_geo.html('<div class="heatmap_tooltip">' + "Location: " + d.properties.Nbrhood + "<br/>" + "Damage Level: " + (geo_data[d.properties.Id-1].value)[feature_id].toFixed(2) + "<br/>" +
+                "Report Quantity: " + ((geo_data[d.properties.Id -1]).noreport[feature_id]) + "<br/>" +'</div>');
             tooltip_geo.style("visibility", "visible");
         })
         .on('mouseout', function (cell) {
@@ -194,7 +197,7 @@ function drawMap(geojsonFeatures, feature_id) {
             tooltip_geo.style("visibility", "hidden");
         })
         .on("mousemove", function (cell) {
-            tooltip_geo.style("top", (d3.event.pageY - 200) + "px").style("left", (d3.event.pageX - 65) + "px");
+            tooltip_geo.style("top", (d3.event.pageY - 100) + "px").style("left", (d3.event.pageX - 65) + "px");
         });
     groupGeo.selectAll("geoHospitals").data(hospitals)
         .enter()
@@ -205,12 +208,6 @@ function drawMap(geojsonFeatures, feature_id) {
         .attr("width", "15")
         .attr("height", "15");
 
-
-    // Draw the nuclear plant
-    // groupGeo.append("circle")
-    //     .attr("class", "geoNuclear")
-    //     .attr("cx", d => projection(nuclearPlant)[0])
-    //     .attr("cy", d => projection(nuclearPlant)[1]);
 groupGeo.append("svg:image")
         .attr("xlink:href", "https://img.icons8.com/small/52/000000/nuclear-power-plant.png")
 .attr("x", d => projection(nuclearPlant)[0])
@@ -235,10 +232,12 @@ groupGeo.append("svg:image")
             return null;
         })
         .text(d => d.name);
-
 }
 
-//
+
+
+
+
 
 
 
